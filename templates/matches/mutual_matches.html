@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Mutual Matches · TravelMatch{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="page-hero d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+  <div>
+    <h2 class="fw-bold mb-1" style="letter-spacing:-.02em;">
+      <i class="bi bi-heart-fill me-2"></i>Mutual Matches
+    </h2>
+    <p class="mb-0" style="opacity:.85;font-size:.9rem;">
+      People you both liked — you can message each other.
+    </p>
+  </div>
+  <a href="{% url 'match_feed' %}" class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.35);">
+    <i class="bi bi-compass me-1"></i>Discover More
+  </a>
+</div>
+
+{% if mutual_matches %}
+<div class="row g-3">
+  {% for item in mutual_matches %}
+  {% with item.user as u %}
+  <div class="col-sm-6 col-lg-4">
+    <div class="card card-hover-lift border-0 shadow-sm" style="overflow:hidden;">
+      <!-- Top colour strip by score -->
+      <div style="height:6px;background:
+        {% if item.score >= 75 %}linear-gradient(90deg,#10b981,#34d399){% elif item.score >= 50 %}linear-gradient(90deg,#6366f1,#8b5cf6){% elif item.score >= 30 %}linear-gradient(90deg,#f59e0b,#f97316){% else %}linear-gradient(90deg,#94a3b8,#64748b){% endif %};"></div>
+
+      <div class="card-body p-4">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <!-- Avatar -->
+          <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold text-white"
+               style="width:52px;height:52px;font-size:1.2rem;background:linear-gradient(135deg,#6366f1,#8b5cf6);">
+            {{ u.username|first|upper }}
+          </div>
+          <div class="flex-grow-1 min-w-0">
+            <div class="fw-bold text-truncate">{{ u.username }}</div>
+            {% with u.profile as p %}
+            <div class="text-muted small">{{ p.get_style_display }} · {{ p.get_budget_display }}</div>
+            {% endwith %}
+          </div>
+          <!-- Score badge -->
+          <span class="badge fw-bold px-2" style="font-size:.78rem;background:
+            {% if item.score >= 75 %}rgba(16,185,129,.12);color:#059669{% elif item.score >= 50 %}rgba(99,102,241,.12);color:#4f46e5{% elif item.score >= 30 %}rgba(245,158,11,.12);color:#d97706{% else %}rgba(148,163,184,.12);color:#64748b{% endif %};">
+            {{ item.score }}%
+          </span>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="progress mb-3" style="height:4px;">
+          <div class="progress-bar" style="width:{{ item.score|floatformat:0 }}%;background:
+            {% if item.score >= 75 %}linear-gradient(90deg,#10b981,#34d399){% elif item.score >= 50 %}linear-gradient(90deg,#6366f1,#8b5cf6){% elif item.score >= 30 %}linear-gradient(90deg,#f59e0b,#f97316){% else %}linear-gradient(90deg,#94a3b8,#64748b){% endif %};"></div>
+        </div>
+
+        <!-- Latest DM preview -->
+        {% if item.latest_dm %}
+        <div class="d-flex align-items-center gap-2 mb-3 p-2 rounded-3" style="background:#f8f9fc;">
+          <i class="bi bi-chat-dots text-muted" style="font-size:.85rem;"></i>
+          <span class="text-muted text-truncate" style="font-size:.78rem;">
+            {% if item.latest_dm.sender == request.user %}You: {% endif %}{{ item.latest_dm.body|truncatechars:50 }}
+          </span>
+          {% if item.unread > 0 %}
+          <span class="badge rounded-pill ms-auto flex-shrink-0" style="background:#f43f5e;font-size:.65rem;">{{ item.unread }}</span>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Action buttons -->
+        <div class="d-flex gap-2">
+          <a href="{% url 'dm_conversation' u.pk %}" class="btn btn-message btn-sm flex-fill">
+            <i class="bi bi-chat-dots me-1"></i>
+            {% if item.unread > 0 %}Message ({{ item.unread }}){% else %}Message{% endif %}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endwith %}
+  {% endfor %}
+</div>
+
+{% else %}
+<div class="text-center py-5 mt-3">
+  <div class="mb-3" style="font-size:4rem;opacity:.2;">💬</div>
+  <h5 class="mb-2">No mutual matches yet</h5>
+  <p class="text-muted mb-4">When you and another traveler both like each other, they'll appear here.<br>You'll be able to send private messages!</p>
+  <a href="{% url 'match_feed' %}" class="btn btn-primary px-4">
+    <i class="bi bi-compass me-2"></i>Discover Travelers
+  </a>
+</div>
+{% endif %}
+{% endblock %}

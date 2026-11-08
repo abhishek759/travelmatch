@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block title %}Discover · TravelMatch{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+  <div>
+    <h2 class="fw-bold mb-0" style="letter-spacing:-.02em;">Discover Travelers</h2>
+    <p class="text-muted mb-0 small">Ranked by compatibility with your travel preferences.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'mutual_matches' %}" class="btn btn-outline-primary btn-sm">
+      <i class="bi bi-heart me-1"></i>Mutual Matches
+    </a>
+    <a href="{% url 'profile' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-sliders me-1"></i>Preferences
+    </a>
+  </div>
+</div>
+
+{% if ranked %}
+<div id="match-feed" class="row g-4">
+  {% for match_user, score in ranked %}
+  {% with match_user.profile as mp %}
+
+  <div class="col-md-6 col-lg-4" id="card-{{ match_user.pk }}">
+    <div class="card border-0 shadow-sm card-hover-lift h-100" style="overflow:hidden;">
+
+      <!-- Coloured header band -->
+      <div class="match-card-header {% if score >= 75 %}score-high{% elif score >= 50 %}score-mid{% elif score >= 30 %}score-low{% else %}score-poor{% endif %}">
+        <!-- Score badge -->
+        <div class="position-absolute" style="top:.75rem;right:.75rem;">
+          <span class="badge text-white fw-bold px-2 py-1" style="background:rgba(0,0,0,.25);font-size:.78rem;border-radius:.5rem;">
+            {{ score|floatformat:0 }}% match
+          </span>
+        </div>
+        <!-- Overlapping avatar -->
+        <div class="match-card-avatar {% if score >= 75 %}score-high{% elif score >= 50 %}score-mid{% elif score >= 30 %}score-low{% else %}score-poor{% endif %}">
+          {{ match_user.username|first|upper }}
+        </div>
+      </div>
+
+      <div class="card-body px-4 pt-5 pb-4">
+        <div class="mb-3 mt-1">
+          <div class="fw-bold fs-6">{{ match_user.username }}</div>
+          <div class="text-muted small">{{ mp.get_style_display }} traveler · {{ mp.get_budget_display }}</div>
+        </div>
+
+        <!-- Compatibility bar -->
+        <div class="progress mb-3" style="height:5px;">
+          <div class="progress-bar {% if score >= 75 %}bg-success{% elif score >= 50 %}bg-primary{% elif score >= 30 %}bg-warning{% else %}bg-secondary{% endif %}"
+               style="width:{{ score|floatformat:0 }}%;"></div>
+        </div>
+
+        <!-- Bio -->
+        {% if mp.bio %}
+        <p class="text-muted small mb-3" style="line-height:1.5;">{{ mp.bio|truncatechars:100 }}</p>
+        {% endif %}
+
+        <!-- Pref badges -->
+        <div class="d-flex flex-wrap gap-1 mb-3">
+          <span class="badge bg-light text-dark border" style="font-size:.72rem;"><i class="bi bi-clock me-1"></i>{{ mp.get_duration_display }}</span>
+          <span class="badge bg-light text-dark border" style="font-size:.72rem;"><i class="bi bi-house me-1"></i>{{ mp.get_accommodation_display }}</span>
+        </div>
+
+        <!-- Destinations -->
+        {% if mp.destinations %}
+        <div class="d-flex flex-wrap gap-1 mb-3">
+          {% for d in mp.destinations|slice:":3" %}
+          <span class="badge bg-primary bg-opacity-10 text-primary" style="font-size:.7rem;">{{ d|title }}</span>
+          {% endfor %}
+          {% if mp.destinations|length > 3 %}
+          <span class="badge bg-secondary bg-opacity-10 text-secondary" style="font-size:.7rem;">+{{ mp.destinations|length|add:"-3" }} more</span>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Action buttons -->
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm flex-fill match-action-btn"
+                  style="background:#fff1f2;color:#f43f5e;border:1px solid #fecdd3;font-weight:600;"
+                  data-user-id="{{ match_user.pk }}" data-action="pass">
+            <i class="bi bi-x-lg me-1"></i>Pass
+          </button>
+          <button class="btn btn-primary btn-sm flex-fill match-action-btn"
+                  data-user-id="{{ match_user.pk }}" data-action="like">
+            <i class="bi bi-heart me-1"></i>Like
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% endwith %}
+  {% endfor %}
+</div>
+
+{% else %}
+<div class="text-center py-5">
+  <div class="mb-3" style="font-size:4rem;opacity:.2;">🧭</div>
+  <h5 class="mb-2">No more travelers to show</h5>
+  <p class="text-muted">You've reviewed everyone available. Check back soon!</p>
+  <a href="{% url 'profile' %}" class="btn btn-primary mt-2">Update Preferences</a>
+</div>
+{% endif %}
+
+<!-- "It's a Match!" toast overlay -->
+<div id="match-toast">
+  <div class="match-toast-box">
+    <div class="match-toast-icon">🎉</div>
+    <div class="match-toast-title">It's a Match!</div>
+    <p class="text-muted mb-3">You and <strong id="match-toast-name"></strong> both liked each other.</p>
+    <div class="d-flex gap-2 justify-content-center">
+      <a id="match-toast-msg" href="#" class="btn btn-primary btn-sm px-3">
+        <i class="bi bi-chat-dots me-1"></i>Send a message
+      </a>
+      <button onclick="document.getElementById('match-toast').classList.remove('show')" class="btn btn-outline-secondary btn-sm px-3">
+        Keep browsing
+      </button>
+    </div>
+  </div>
+</div>
+
+<form id="csrf-form" style="display:none">{% csrf_token %}</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  const csrf  = document.querySelector('#csrf-form [name=csrfmiddlewaretoken]').value;
+  const toast = document.getElementById('match-toast');
+
+  document.querySelectorAll('.match-action-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const userId = this.dataset.userId;
+      const action = this.dataset.action;
+      const card   = document.getElementById('card-' + userId);
+      const fd = new FormData();
+      fd.append('action', action);
+      fd.append('csrfmiddlewaretoken', csrf);
+
+      fetch(`/matches/${userId}/action/`, {method:'POST', body:fd})
+        .then(r => r.json())
+        .then(data => {
+          if (data.ok && card) {
+            card.style.transition = 'opacity .3s, transform .3s';
+            card.style.opacity = '0';
+            card.style.transform = action === 'like' ? 'scale(1.04)' : 'scale(.96)';
+            setTimeout(() => card.remove(), 320);
+
+            if (data.mutual) {
+              document.getElementById('match-toast-name').textContent = data.target;
+              document.getElementById('match-toast-msg').href = `/messages/${data.target_id}/`;
+              toast.classList.add('show');
+            }
+          }
+        });
+    });
+  });
+
+  toast.addEventListener('click', e => { if (e.target === toast) toast.classList.remove('show'); });
+})();
+</script>
+{% endblock %}

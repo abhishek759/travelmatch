@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TravelMatch — Complete Project Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    line-height: 1.75;
+    color: #1e293b;
+    background: #fff;
+    padding: 0;
+  }
+
+  /* ── Cover page ── */
+  .cover {
+    page-break-after: always;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 60%, #a78bfa 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px;
+    color: white;
+  }
+  .cover-logo {
+    width: 90px; height: 90px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 48px;
+    margin: 0 auto 32px;
+    border: 2px solid rgba(255,255,255,0.35);
+  }
+  .cover h1 { font-size: 52px; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; }
+  .cover .subtitle { font-size: 20px; opacity: 0.85; margin-bottom: 48px; font-weight: 400; }
+  .cover-tags { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 60px; }
+  .cover-tag {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 999px;
+    padding: 6px 18px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .cover-meta { opacity: 0.7; font-size: 13px; }
+  .cover-toc {
+    background: rgba(255,255,255,0.12); border-radius: 16px; padding: 28px 40px;
+    text-align: left; border: 1px solid rgba(255,255,255,0.2); margin-top: 40px; width: 100%; max-width: 600px;
+  }
+  .cover-toc h3 { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; margin-bottom: 16px; }
+  .cover-toc ol { padding-left: 20px; }
+  .cover-toc li { margin-bottom: 8px; font-size: 14px; }
+
+  /* ── Page layout ── */
+  .page {
+    max-width: 860px; margin: 0 auto;
+    padding: 56px 64px;
+  }
+
+  /* ── Chapter header ── */
+  .chapter {
+    page-break-before: always;
+    padding-top: 0;
+  }
+  .chapter-header {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    border-radius: 16px;
+    padding: 32px 36px;
+    margin-bottom: 36px;
+  }
+  .chapter-number { font-size: 12px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.75; margin-bottom: 6px; }
+  .chapter-title { font-size: 30px; font-weight: 800; letter-spacing: -0.5px; }
+  .chapter-desc { margin-top: 8px; opacity: 0.85; font-size: 14px; }
+
+  /* ── Section headers ── */
+  h2 {
+    font-size: 20px; font-weight: 700; color: #1e293b;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 8px;
+    margin: 36px 0 16px;
+  }
+  h3 {
+    font-size: 16px; font-weight: 700; color: #4f46e5;
+    margin: 28px 0 10px;
+  }
+  h4 { font-size: 14px; font-weight: 600; color: #1e293b; margin: 20px 0 8px; }
+
+  p { margin-bottom: 12px; }
+
+  /* ── File path badge ── */
+  .filepath {
+    display: inline-block;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #6366f1;
+    border-radius: 0 8px 8px 0;
+    padding: 8px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #6366f1;
+    font-weight: 600;
+    margin: 16px 0 10px;
+    page-break-after: avoid;
+  }
+
+  /* ── Code blocks ── */
+  pre {
+    background: #0f172a;
+    color: #e2e8f0;
+    border-radius: 10px;
+    padding: 18px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    line-height: 1.65;
+    overflow-x: auto;
+    margin: 14px 0 18px;
+    page-break-inside: avoid;
+    border: 1px solid #1e293b;
+  }
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: #6366f1;
+  }
+  pre code { background: none; border: none; color: inherit; padding: 0; font-size: inherit; }
+
+  /* Syntax highlight colors */
+  .kw { color: #c084fc; }   /* keywords */
+  .fn { color: #67e8f9; }   /* functions */
+  .st { color: #86efac; }   /* strings */
+  .cm { color: #64748b; font-style: italic; } /* comments */
+  .cl { color: #fbbf24; }   /* classes */
+  .nm { color: #f8fafc; }   /* names/vars */
+  .nb { color: #fb923c; }   /* numbers */
+
+  /* ── Tables ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    margin: 14px 0 20px;
+    page-break-inside: avoid;
+  }
+  th {
+    background: #6366f1;
+    color: white;
+    padding: 9px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  th:first-child { border-radius: 8px 0 0 0; }
+  th:last-child { border-radius: 0 8px 0 0; }
+  td {
+    padding: 8px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: #f8fafc; }
+  tr:last-child td { border-bottom: none; }
+
+  /* ── Callout boxes ── */
+  .callout {
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-size: 13px;
+    page-break-inside: avoid;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .callout-body { flex: 1; }
+  .callout-body strong { display: block; margin-bottom: 4px; }
+  .callout.info { background: #eff6ff; border-left: 4px solid #3b82f6; }
+  .callout.tip  { background: #f0fdf4; border-left: 4px solid #22c55e; }
+  .callout.warn { background: #fffbeb; border-left: 4px solid #f59e0b; }
+  .callout.key  { background: #faf5ff; border-left: 4px solid #8b5cf6; }
+
+  /* ── Flow diagram (text-based) ── */
+  .flow {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 18px 22px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 2;
+    margin: 14px 0 20px;
+    page-break-inside: avoid;
+  }
+  .flow-step { color: #6366f1; font-weight: 600; }
+  .flow-arrow { color: #94a3b8; }
+
+  /* ── Structure tree ── */
+  .tree {
+    background: #0f172a;
+    color: #94a3b8;
+    border-radius: 10px;
+    padding: 20px 22px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.9;
+    margin: 14px 0 20px;
+  }
+  .tree .dir  { color: #67e8f9; font-weight: 600; }
+  .tree .file { color: #e2e8f0; }
+  .tree .note { color: #64748b; }
+
+  /* ── Formula box ── */
+  .formula {
+    background: linear-gradient(135deg, #faf5ff, #eff6ff);
+    border: 1px solid #c4b5fd;
+    border-radius: 10px;
+    padding: 18px 22px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 2.2;
+    margin: 14px 0 20px;
+    page-break-inside: avoid;
+  }
+  .formula .label { color: #7c3aed; font-weight: 700; font-family: 'Inter', sans-serif; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px; }
+
+  /* ── Section divider ── */
+  .divider {
+    height: 3px;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6, transparent);
+    border-radius: 2px;
+    margin: 32px 0;
+  }
+
+  /* ── Highlight pill ── */
+  .pill {
+    display: inline-block;
+    background: #ede9fe;
+    color: #6d28d9;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 11.5px;
+    font-weight: 600;
+    margin: 0 2px;
+  }
+
+  /* ── List styling ── */
+  ul, ol { padding-left: 22px; margin-bottom: 14px; }
+  li { margin-bottom: 6px; }
+  ul li::marker { color: #6366f1; }
+
+  /* ── Print ── */
+  @media print {
+    body { font-size: 12px; }
+    .cover { min-height: 100vh; }
+    .page { padding: 40px 48px; }
+    pre { font-size: 10.5px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ COVER ══ -->
+<div class="cover">
+  <div class="cover-logo">✈</div>
+  <h1>TravelMatch</h1>
+  <div class="subtitle">Complete Developer Guide — Every File Explained</div>
+  <div class="cover-tags">
+    <span class="cover-tag">Django 4.2</span>
+    <span class="cover-tag">SQLite</span>
+    <span class="cover-tag">Bootstrap 5.3</span>
+    <span class="cover-tag">Python 3.13</span>
+    <span class="cover-tag">AJAX Polling</span>
+    <span class="cover-tag">Matching Algorithm</span>
+  </div>
+
+  <div class="cover-toc">
+    <h3>Table of Contents</h3>
+    <ol>
+      <li>Project Overview &amp; Architecture</li>
+      <li>Project Configuration Files</li>
+      <li>Database Models — <code style="background:rgba(255,255,255,0.15);color:white;border:none">core/models.py</code></li>
+      <li>Views — <code style="background:rgba(255,255,255,0.15);color:white;border:none">core/views.py</code></li>
+      <li>Forms — <code style="background:rgba(255,255,255,0.15);color:white;border:none">core/forms.py</code></li>
+      <li>Matching Algorithm — <code style="background:rgba(255,255,255,0.15);color:white;border:none">services/matching.py</code></li>
+      <li>Settlement Algorithm — <code style="background:rgba(255,255,255,0.15);color:white;border:none">services/settlement.py</code></li>
+      <li>Templates — All HTML Pages</li>
+      <li>Static Files — CSS &amp; JavaScript</li>
+      <li>How Everything Connects — End-to-End Flows</li>
+    </ol>
+  </div>
+  <div class="cover-meta" style="margin-top:24px">TravelMatch · Django Project · April 2026</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ CHAPTER 1 ══ -->
+<div class="page chapter">
+  <div class="chapter-header">
+    <div class="chapter-number">Chapter 1</div>
+    <div class="chapter-title">Project Overview &amp; Architecture</div>
+    <div class="chapter-desc">What TravelMatch is, how the pieces fit together, and the full file structure.</div>
+  </div>
+
+  <h2>What Is TravelMatch?</h2>
+  <p>TravelMatch is a full-stack web platform that helps people find compatible travel companions. It has five core features:</p>
+  <ul>
+    <li><strong>Smart Matching</strong> — scores users against each other using a weighted algorithm across budget, style, destinations, duration, and accommodation</li>
+    <li><strong>Group Trip Management</strong> — create or join trip groups using invite codes</li>
+    <li><strong>Real-Time Chat</strong> — AJAX polling fetches new messages every 2 seconds without refreshing</li>
+    <li><strong>Collaborative Itinerary</strong> — drag-to-reorder day plans shared across all members</li>
+    <li><strong>Expense Tracking</strong> — splits costs equally, exactly, or by percentage; auto-calculates who owes what</li>
+  </ul>
+
+  <h2>Technology Stack</h2>
+  <table>
+    <tr><th>Layer</th><th>Technology</th><th>Why</th></tr>
+    <tr><td>Backend framework</td><td>Django 4.2</td><td>Batteries-included: ORM, auth, admin, forms, CSRF all built in</td></tr>
+    <tr><td>Database</td><td>SQLite (file-based)</td><td>Zero setup for local development — single <code>db.sqlite3</code> file</td></tr>
+    <tr><td>Frontend CSS</td><td>Bootstrap 5.3.3</td><td>Responsive grid, ready-made components, dark/light theming</td></tr>
+    <tr><td>Frontend Icons</td><td>Bootstrap Icons 1.11</td><td>600+ icons, CSS-only</td></tr>
+    <tr><td>Drag-to-reorder</td><td>SortableJS 1.15</td><td>Touch-friendly drag-drop library, zero dependencies</td></tr>
+    <tr><td>Font</td><td>Inter (Google Fonts)</td><td>Clean, modern, highly readable</td></tr>
+    <tr><td>Real-time chat</td><td>AJAX long-polling</td><td>No WebSocket/Redis needed; works on basic hosting</td></tr>
+  </table>
+
+  <h2>Complete File Structure</h2>
+  <div class="tree">
+    <span class="dir">travelmatch/</span>  <span class="note">← your project root</span><br>
+    ├── <span class="file">manage.py</span>             <span class="note">← Django CLI (runserver, migrate, etc.)</span><br>
+    ├── <span class="file">requirements.txt</span>      <span class="note">← Python package list (pip install -r requirements.txt)</span><br>
+    ├── <span class="file">db.sqlite3</span>            <span class="note">← the actual database file (do NOT commit to git)</span><br>
+    │<br>
+    ├── <span class="dir">travelmatch_project/</span>   <span class="note">← global config (settings, urls, wsgi)</span><br>
+    │   ├── <span class="file">settings.py</span>       <span class="note">← all configuration: DB, apps, static, auth</span><br>
+    │   ├── <span class="file">urls.py</span>           <span class="note">← master URL routing table</span><br>
+    │   ├── <span class="file">asgi.py</span>           <span class="note">← async server hook (deployment)</span><br>
+    │   └── <span class="file">wsgi.py</span>           <span class="note">← sync server hook (deployment)</span><br>
+    │<br>
+    ├── <span class="dir">core/</span>                  <span class="note">← 100% of your application logic</span><br>
+    │   ├── <span class="file">models.py</span>         <span class="note">← database tables as Python classes</span><br>
+    │   ├── <span class="file">views.py</span>          <span class="note">← request handlers (URL → function → response)</span><br>
+    │   ├── <span class="file">forms.py</span>          <span class="note">← HTML form definitions &amp; validation</span><br>
+    │   ├── <span class="file">admin.py</span>          <span class="note">← registers models in /admin panel</span><br>
+    │   ├── <span class="file">apps.py</span>           <span class="note">← app config boilerplate</span><br>
+    │   ├── <span class="file">migrations/</span><br>
+    │   │   └── <span class="file">0001_initial.py</span><span class="note">← auto-generated SQL to create all tables</span><br>
+    │   └── <span class="dir">services/</span>          <span class="note">← pure business logic (no Django HTTP stuff)</span><br>
+    │       ├── <span class="file">matching.py</span>   <span class="note">← compatibility scoring algorithm</span><br>
+    │       └── <span class="file">settlement.py</span> <span class="note">← debt simplification algorithm</span><br>
+    │<br>
+    ├── <span class="dir">templates/</span>             <span class="note">← all HTML pages</span><br>
+    │   ├── <span class="file">base.html</span>         <span class="note">← master layout (navbar, flash messages)</span><br>
+    │   ├── <span class="file">home.html</span>         <span class="note">← landing page for logged-out visitors</span><br>
+    │   ├── <span class="file">dashboard.html</span>    <span class="note">← home screen after login</span><br>
+    │   ├── <span class="dir">auth/</span>              <span class="note">← signup, onboarding, profile pages</span><br>
+    │   ├── <span class="dir">matches/</span>           <span class="note">← match feed (like/pass cards)</span><br>
+    │   ├── <span class="dir">groups/</span>            <span class="note">← group list, create, detail (chat/itinerary/expenses)</span><br>
+    │   └── <span class="dir">registration/</span>     <span class="note">← Django's built-in login page (overridden)</span><br>
+    │<br>
+    └── <span class="dir">static/</span>               <span class="note">← CSS, JavaScript, images</span><br>
+        ├── <span class="dir">css/</span> <span class="file">travelmatch.css</span>  <span class="note">← design system, color overrides</span><br>
+        └── <span class="dir">js/</span>  <span class="file">travelmatch.js</span>   <span class="note">← global JS (auto-dismiss alerts)</span><br>
+  </div>
+
+  <div class="callout info">
+    <div class="callout-icon">ℹ️</div>
+    <div class="callout-body">
+      <strong>Django's Request Lifecycle</strong>
+      A browser sends a request → Django looks up the URL in <code>urls.py</code> → calls the matching function in <code>views.py</code> → that function reads/writes the database via <code>models.py</code> → renders an HTML template → sends the response back.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ CHAPTER 2 ══ -->
+<div class="page chapter">
+  <div class="chapter-header">
+    <div class="chapter-number">Chapter 2</div>
+    <div class="chapter-title">Project Configuration Files</div>
+    <div class="chapter-desc">manage.py, settings.py, and urls.py — the three files that glue everything together.</div>
+  </div>
+
+  <div class="filepath">manage.py</div>
+  <p>This is the command-line tool for your entire project. You <em>never edit it</em> — you only run it. Here's what the key commands do:</p>
+  <table>
+    <tr><th>Command</th><th>What it does</th></tr>
+    <tr><td><code>python manage.py runserver</code></td><td>Starts the development web server at http://127.0.0.1:8000</td></tr>
+    <tr><td><code>python manage.py makemigrations</code></td><td>Reads your models.py, detects changes, generates a migration file</td></tr>
+    <tr><td><code>python manage.py migrate</code></td><td>Applies all pending migrations to the database (creates/alters tables)</td></tr>
+    <tr><td><code>python manage.py createsuperuser</code></td><td>Creates an admin user for the /admin panel</td></tr>
+    <tr><td><code>python manage.py shell</code></td><td>Opens a Python REPL with Django fully loaded — great for testing</td></tr>
+  </table>
+
+  <div class="divider"></div>
+
+  <div class="filepath">travelmatch_project/settings.py</div>
+  <p>The master configuration file. The most important settings:</p>
+
+  <pre><code><span class="cm"># Which apps are active — Django's built-ins + your own</span>
+<span class="nm">INSTALLED_APPS</span> = [
+    <span class="st">"django.contrib.admin"</span>,      <span class="cm"># /admin panel</span>
+    <span class="st">"django.contrib.auth"</span>,       <span class="cm"># login/logout/user model</span>
+    <span class="st">"django.contrib.sessions"</span>,   <span class="cm"># cookie sessions</span>
+    <span class="st">"django.contrib.messages"</span>,   <span class="cm"># flash messages</span>
+    <span class="st">"django.contrib.staticfiles"</span>,<span class="cm"># CSS/JS serving</span>
+    <span class="st">"core"</span>,                      <span class="cm"># YOUR application</span>
+]
+
+<span class="cm"># SQLite database — single file, zero setup</span>
+<span class="nm">DATABASES</span> = {
+    <span class="st">"default"</span>: {
+        <span class="st">"ENGINE"</span>: <span class="st">"django.db.backends.sqlite3"</span>,
+        <span class="st">"NAME"</span>: <span class="nm">BASE_DIR</span> / <span class="st">"db.sqlite3"</span>,
+    }
+}
+
+<span class="cm"># Where Django looks for HTML templates</span>
+<span class="nm">TEMPLATES</span> = [{ <span class="st">"DIRS"</span>: [<span class="nm">BASE_DIR</span> / <span class="st">"templates"</span>], ... }]
+
+<span class="cm"># Where Django looks for CSS/JS/image files</span>
+<span class="nm">STATICFILES_DIRS</span> = [<span class="nm">BASE_DIR</span> / <span class="st">"static"</span>]
+
+<span class="cm"># After login → go to dashboard. After logout → go to home.</span>
+<span class="nm">LOGIN_REDIRECT_URL</span>  = <span class="st">"dashboard"</span>
+<span class="nm">LOGOUT_REDIRECT_URL</span> = <span class="st">"home"</span></code></pre>
+
+  <div class="callout warn">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-body">
+      <strong>DEBUG = True is only for development</strong>
+      When <code>DEBUG = True</code>, Django shows you full error pages with stack traces — very useful for coding. But <strong>never deploy to a public server with DEBUG = True</strong> — it leaks code internals to anyone who visits.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="filepath">travelmatch_project/urls.py</div>
+  <p>The <strong>URL routing table</strong>. This is the list of every URL your app responds to, paired with the Python function that handles it. Think of it like a switchboard.</p>
+  <pre><code><span class="kw">from</span> django.urls <span class="kw">import</span> include, path
+<span class="kw">from</span> core <span class="kw">import</span> views <span class="kw">as</span> v
+
+<span class="nm">urlpatterns</span> = [
+    <span class="cm"># Built-in Django auth URLs (login, password reset)</span>
+    path(<span class="st">"accounts/"</span>, include(<span class="st">"django.contrib.auth.urls"</span>)),
+    path(<span class="st">"accounts/signup/"</span>, v.signup_view, name=<span class="st">"signup"</span>),
+    path(<span class="st">"accounts/logout/"</span>, v.logout_view, name=<span class="st">"logout"</span>),
+
+    <span class="cm"># Core pages</span>
+    path(<span class="st">""</span>,            v.home,         name=<span class="st">"home"</span>),
+    path(<span class="st">"dashboard/"</span>,  v.dashboard,    name=<span class="st">"dashboard"</span>),
+    path(<span class="st">"onboarding/"</span>, v.onboarding,   name=<span class="st">"onboarding"</span>),
+    path(<span class="st">"profile/"</span>,    v.profile_view, name=<span class="st">"profile"</span>),
+
+    <span class="cm"># Matching</span>
+    path(<span class="st">"matches/"</span>,                    v.match_feed,   name=<span class="st">"match_feed"</span>),
+    path(<span class="st">"matches/&lt;int:user_id&gt;/action/"</span>, v.match_action, name=<span class="st">"match_action"</span>),
+
+    <span class="cm"># Groups CRUD</span>
+    path(<span class="st">"groups/"</span>,               v.group_list,   name=<span class="st">"group_list"</span>),
+    path(<span class="st">"groups/create/"</span>,        v.group_create, name=<span class="st">"group_create"</span>),
+    path(<span class="st">"groups/&lt;int:pk&gt;/"</span>,      v.group_detail, name=<span class="st">"group_detail"</span>),
+    path(<span class="st">"groups/&lt;int:pk&gt;/join/"</span>, v.group_join,   name=<span class="st">"group_join"</span>),
+    ...
+    <span class="cm"># Chat, Itinerary, Expenses — all AJAX</span>
+    path(<span class="st">"groups/&lt;int:pk&gt;/chat/messages/"</span>, v.chat_messages, name=<span class="st">"chat_messages"</span>),
+]</code></pre>
+
+  <p>The <code>name=</code> parameter lets templates reference URLs by name instead of hardcoding paths. For example, <code>{% url 'dashboard' %}</code> in a template automatically becomes <code>/dashboard/</code>.</p>
+
+  <p>The <code>&lt;int:pk&gt;</code> part is a <strong>URL parameter</strong> — it captures the number from the URL and passes it to the view function as <code>pk</code>. So <code>/groups/7/</code> calls <code>group_detail(request, pk=7)</code>.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════ CHAPTER 3 ══ -->
+<div class="page chapter">
+  <div class="chapter-header">
+    <div class="chapter-number">Chapter 3</div>
+    <div class="chapter-title">Database Models</div>
+    <div class="chapter-desc">core/models.py — Every database table as a Python class, and why each field exists.</div>
+  </div>
+
+  <div class="filepath">core/models.py</div>
+
+  <p>In Django, you define your database structure in Python — not SQL. Each class is a table. Each class attribute is a column. Django's ORM translates your Python into SQL automatically. When you change a model and run <code>makemigrations</code>, Django figures out what SQL <code>ALTER TABLE</code> statements are needed.</p>
+
+  <div class="callout tip">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body">
+      <strong>Key concept: ForeignKey</strong>
+      A <code>ForeignKey</code> means "this row belongs to one row in another table." For example, <code>GroupMember.group = ForeignKey(TripGroup)</code> means each membership record belongs to one group. <code>on_delete=models.CASCADE</code> means if that group is deleted, all its memberships are deleted too.
+    </div>
+  </div>
+
+  <h2>Model 1: Profile</h2>
+  <p>Django's built-in <code>User</code> model only stores username, email, and password. <code>Profile</code> extends it with everything TravelMatch needs for matching.</p>
+
+  <pre><code><span class="kw">class</span> <span class="cl">Profile</span>(models.Model):
+    <span class="cm"># Links to exactly one User. If the User is deleted, Profile is deleted too.</span>
+    user          = models.OneToOneField(User, on_delete=models.CASCADE, related_name=<span class="st">"profile"</span>)
+    bio           = models.TextField(blank=<span class="kw">True</span>)
+    avatar_url    = models.URLField(blank=<span class="kw">True</span>)
+
+    <span class="cm"># JSONField stores a Python list in a single DB column, e.g. ["europe", "east_asia"]</span>
+    destinations  = models.JSONField(default=list, blank=<span class="kw">True</span>)
+    travel_months = models.JSONField(default=list, blank=<span class="kw">True</span>) <span class="cm"># [6, 7, 8] = Jun/Jul/Aug</span>
+
+    <span class="cm"># Single-value preferences — stored as short strings</span>
+    style         = models.CharField(max_length=<span class="nb">20</span>, choices=STYLE_CHOICES, default=<span class="st">"mixed"</span>)
+    budget        = models.CharField(max_length=<span class="nb">10</span>, choices=BUDGET_CHOICES, default=<span class="st">"mid"</span>)
+    duration      = models.CharField(max_length=<span class="nb">20</span>, choices=DURATION_CHOICES, default=<span class="st">"week"</span>)
+    accommodation = models.CharField(max_length=<span class="nb">10</span>, choices=ACCOMMODATION_CHOICES, default=<span class="st">"hotel"</span>)
+
+    <span class="cm"># Flag: has the user completed the onboarding questionnaire?</span>
+    onboarding_complete = models.BooleanField(default=<span class="kw">False</span>)
+
+    <span class="cm"># @property = computed on the fly, not stored in DB</span>
+    <span class="kw">@property</span>
+    <span class="kw">def</span> <span class="fn">preference_dict</span>(self):
+        <span class="cm"># Returns a plain dict — used by the matching algorithm</span>
+        <span class="kw">return</span> { <span class="st">"destinations"</span>: self.destinations, <span class="st">"style"</span>: self.style,
+                  <span class="st">"budget"</span>: self.budget, <span class="st">"duration"</span>: self.duration,
+                  <span class="st">"accommodation"</span>: self.accommodation }</code></pre>
+
+  <h2>Model 2: MatchAction</h2>
+  <p>Records every like/pass decision a user makes. Used to prevent showing the same person twice.</p>
+  <pre><code><span class="kw">class</span> <span class="cl">MatchAction</span>(models.Model):
+    actor  = models.ForeignKey(User, related_name=<span class="st">"match_actions"</span>)  <span class="cm"># who clicked</span>
+    target = models.ForeignKey(User, related_name=<span class="st">"match_targets"</span>)  <span class="cm"># who they acted on</span>
+    action = models.CharField(max_length=<span class="nb">5</span>, choices=[(<span class="st">"like"</span>,<span class="st">"Like"</span>),(<span class="st">"pass"</span>,<span class="st">"Pass"</span>)])
+    score  = models.FloatField(default=<span class="nb">0.0</span>)   <span class="cm"># compatibility score saved at time of action</span>
+
+    <span class="kw">class</span> <span class="cl">Meta</span>:
+        unique_together = (<span class="st">"actor"</span>, <span class="st">"target"</span>)  <span class="cm"># can't act on same person twice</span></code></pre>
+
+  <h2>Model 3: TripGroup</h2>
+  <pre><code><span class="kw">class</span> <span class="cl">TripGroup</span>(models.Model):
+    name        = models.CharField(max_length=<span class="nb">100</span>)       <span class="cm"># "Paris Spring 2026"</span>
+    destination = models.CharField(max_length=<span class="nb">200</span>)       <span class="cm"># "Paris, France"</span>
+    start_date  = models.DateField(null=<span class="kw">True</span>, blank=<span class="kw">True</span>)
+    end_date    = models.DateField(null=<span class="kw">True</span>, blank=<span class="kw">True</span>)
+    owner       = models.ForeignKey(User, related_name=<span class="st">"owned_groups"</span>)
+    invite_code = models.CharField(max_length=<span class="nb">16</span>, unique=<span class="kw">True</span>, default=_gen_invite_code)
+    max_members = models.PositiveSmallIntegerField(default=<span class="nb">12</span>)
+    description = models.TextField(blank=<span class="kw">True</span>)
+
+    <span class="kw">@property</span>
+    <span class="kw">def</span> <span class="fn">member_count</span>(self):
+        <span class="kw">return</span> self.memberships.count()  <span class="cm"># counts GroupMember rows for this group</span></code></pre>
+
+  <p>The invite code is generated by this helper — a random 10-character string from uppercase letters and digits:</p>
+  <pre><code><span class="kw">def</span> <span class="fn">_gen_invite_code</span>():
+    alphabet = string.ascii_uppercase + string.digits
+    <span class="kw">return</span> <span class="st">""</span>.join(secrets.choice(alphabet) <span class="kw">for</span> _ <span class="kw">in</span> range(<span class="nb">10</span>))
+<span class="cm"># Example output: "AMEZ5644IS"</span></code></pre>
+
+  <h2>Model 4: GroupMember</h2>
+  <p>The <strong>join table</strong> between users and groups — also stores the user's role within the group.</p>
+  <pre><code><span class="kw">class</span> <span class="cl">GroupMember</span>(models.Model):
+    group     = models.ForeignKey(TripGroup, related_name=<span class="st">"memberships"</span>)
+    user      = models.ForeignKey(User,      related_name=<span class="st">"group_memberships"</span>)
+    role      = models.CharField(choices=[(<span class="st">"owner"</span>,...),(<span class="st">"member"</span>,...)], default=<span class="st">"member"</span>)
+    joined_at = models.DateTimeField(auto_now_add=<span class="kw">True</span>)
+
+    <span class="kw">class</span> <span class="cl">Meta</span>:
+        unique_together = (<span class="st">"group"</span>, <span class="st">"user"</span>)  <span class="cm"># can't be in same group twice</span></code></pre>
+
+  <h2>Model 5: Message</h2>
+  <pre><code><span class="kw">class</span> <span class="cl">Message</span>(models.Model):
+    group   = models.ForeignKey(TripGroup, related_name=<span class="st">"messages"</span>)
+    sender  = models.ForeignKey(User, related_name=<span class="st">"messages"</span>)
+    body    = models.TextField()
+    sent_at = models.DateTimeField(auto_now_add=<span class="kw">True</span>)
+
+    <span class="kw">def</span> <span class="fn">to_dict</span>(self):
+        <span class="cm"># Converts message to JSON-serializable dict for the chat API</span>
+        <span class="kw">return</span> { <span class="st">"id"</span>: self.pk, <span class="st">"sender_id"</span>: self.sender_id,
+                  <span class="st">"sender_name"</span>: self.sender.username,
+                  <span class="st">"body"</span>: self.body, <span class="st">"sent_at"</span>: self.sent_at.isoformat() }</code></pre>
+
+  <h2>Models 6 &amp; 7: ItineraryDay and ItineraryActivity</h2>
+  <p>Two-level hierarchy: a group has many days, each day has many activities.</p>
+  <table>
+    <tr><th>ItineraryDay Field</th><th>Purpose</th></tr>
+    <tr><td><code>group</code></td><td>Which trip group this day belongs to</td></tr>
+    <tr><td><code>day_number</code></td><td>1, 2, 3… auto-incremented by the view</td></tr>
+    <tr><td><code>date</code></td><td>Optional specific calendar date</td></tr>
+    <tr><td><code>title</code></td><td>"Arrival Day", "Beach Day" etc.</td></tr>
+  </table>
+  <table>
+    <tr><th>ItineraryActivity Field</th><th>Purpose</th></tr>
+    <tr><td><code>day</code></td><td>Which ItineraryDay this belongs to</td></tr>
+    <tr><td><code>name</code></td><td>"Visit Eiffel Tower"</td></tr>
+    <tr><td><code>start_time / end_time</code></td><td>Optional time range for the activity</td></tr>
+    <tr><td><code>location_name</code></td><td>"Eiffel Tower, Paris"</td></tr>
+    <tr><td><code>assignee</code></td><td>Optional — which group member is responsible</td></tr>
+    <tr><td><code>order</code></td><td>Integer used for drag-to-reorder (0, 1, 2…)</td></tr>
+  </table>
+
+  <h2>Models 8, 9 &amp; 10: Expense, ExpenseAllocation, BalanceLedger</h2>
+  <p>These three work together to track shared costs:</p>
+  <table>
+    <tr><th>Model</th><th>What it stores</th><th>Example</th></tr>
+    <tr><td><code>Expense</code></td><td>The expense itself — who paid, how much, what for</td><td>Alice paid $120 for hotel</td></tr>
+    <tr><td><code>ExpenseAllocation</code></td><td>Each member's individual share of that expense</td><td>Alice: $40, Bob: $40, Carol: $40</td></tr>
+    <tr><td><code>BalanceLedger</code></td><td>Running net balance per person (updated incrementally)</td><td>Alice: +$80, Bob: -$40, Carol: -$40</td></tr>
+  </table>
+
+  <div class="callout key">
+    <div class="callout-icon">🔑</div>
+    <div class="callout-body">
+      <strong>Why BalanceLedger exists</strong>
+      Without it, to show balances you'd have to sum all expense allocations every time — slow for large groups. Instead, every time an expense is added or deleted, we update the ledger instantly. Balance lookups then take a single fast database query (O(1) instead of O(n)).
+    </div>
+  </div>
+
+  <p><strong>How the ledger is updated</strong> when Alice pays $120 split equally among 3 people:</p>
+  <pre><code><span class="cm"># Alice paid $120, split equally 3 ways ($40 each)</span>
+<span class="cm"># delta = (amount_paid - own_share) for payer, (-own_share) for others</span>
+
+Alice:  delta = (<span class="nb">120</span> - <span class="nb">40</span>) = +<span class="nb">80</span>   <span class="cm"># Alice is owed $80</span>
+Bob:    delta = (<span class="nb">0</span>   - <span class="nb">40</span>) = -<span class="nb">40</span>   <span class="cm"># Bob owes $40</span>
+Carol:  delta = (<span class="nb">0</span>   - <span class="nb">40</span>) = -<span class="nb">40</span>   <span class="cm"># Carol owes $40</span></code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════ CHAPTER 4 ══ -->
+<div class="page chapter">
+  <div class="chapter-header">
+    <div class="chapter-number">Chapter 4</div>
+    <div class="chapter-title">Views — Request Handlers</div>
+    <div class="chapter-desc">core/views.py — Every URL maps to a function here. This is where requests come in and responses go out.</div>
+  </div>
+
+  <p>A view function receives an HTTP <code>request</code> object and returns either an HTML response (from <code>render()</code>) or a JSON response (from <code>JsonResponse()</code>). Every view in this file corresponds to a URL in <code>urls.py</code>.</p>
+
+  <h2>Authentication Views</h2>
+
+  <h3>home()</h3>
+  <pre><code><span class="kw">def</span> <span class="fn">home</span>(request):
+    <span class="kw">if</span> request.user.is_authenticated:
+        <span class="kw">return</span> redirect(<span class="st">"dashboard"</span>)  <span class="cm"># already logged in → skip landing page</span>
+    <span class="kw">return</span> render(request, <span class="st">"home.html"</span>)</code></pre>
+
+  <h3>signup_view()</h3>
+  <pre><code><span class="kw">def</span> <span class="fn">signup_view</span>(request):
+    <span class="kw">if</span> request.method == <span class="st">"POST"</span>:
+        form = SignUpForm(request.POST)
+        <span class="kw">if</span> form.is_valid():
+            user = form.save()               <span class="cm"># creates User with hashed password</span>
+            Profile.objects.create(user=user) <span class="cm"># create blank Profile for them</span>
+            login(request, user)              <span class="cm"># log them in automatically</span>
+            <span class="kw">return</span> redirect(<span class="st">"onboarding"</span>)  <span class="cm"># → go fill in preferences</span>
+    <span class="kw">else</span>:
+        form = SignUpForm()
+    <span class="kw">return</span> render(request, <span class="st">"auth/signup.html"</span>, {<span class="st">"form"</span>: form})</code></pre>
+
+  <div class="callout info">
+    <div class="callout-icon">ℹ️</div>
+    <div class="callout-body">
+      <strong>GET vs POST pattern</strong>
+      All form views use the same pattern: if the browser sends GET (just opening the page), show the empty form. If it sends POST (submitted the form), validate and process. This is called the PRG (Post/Redirect/Get) pattern and prevents duplicate submissions on browser refresh.
+    </div>
+  </div>
+
+  <h2>The Onboarding View</h2>
+  <p>This is the travel preference questionnaire shown once after signup. The tricky part is handling <strong>JSONField lists</strong> from checkboxes:</p>
+  <pre><code><span class="kw">def</span> <span class="fn">onboarding</span>(request):
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+    <span class="kw">if</span> request.method == <span class="st">"POST"</span>:
+        form = OnboardingForm(request.POST, instance=profile)
+        <span class="kw">if</span> form.is_valid():
+            p = form.save(commit=<span class="kw">False</span>)  <span class="cm"># don't save to DB yet</span>
+
+            <span class="cm"># Checkboxes send multiple values for the same field name</span>
+            <span class="cm"># request.POST.getlist() collects ALL checked values as a list</span>
+            p.destinations   = request.POST.getlist(<span class="st">"destinations"</span>)
+            p.travel_months  = [int(m) <span class="kw">for</span> m <span class="kw">in</span> request.POST.getlist(<span class="st">"travel_months"</span>)]
+
+            p.onboarding_complete = <span class="kw">True</span>
+            p.save()  <span class="cm"># NOW save to DB</span>
+            <span class="kw">return</span> redirect(<span class="st">"match_feed"</span>)</code></pre>
+
+  <h2>Match Feed View</h2>
+  <pre><code><span class="kw">def</span> <span class="fn">match_feed</span>(request):
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+    <span class="kw">if not</span> profile.onboarding_complete:
+        <span class="kw">return</span> redirect(<span class="st">"onboarding"</span>)  <span class="cm"># force them to set up preferences first</span>
+
+    <span class="cm"># get_ranked_matches returns list of (User, score) where score is 0.0–1.0</span>
+    <span class="cm"># multiply by 100 so template shows "87%" instead of "0.87"</span>
+    ranked = [(u, round(s * <span class="nb">100</span>, <span class="nb">1</span>)) <span class="kw">for</span> u, s <span class="kw">in</span> get_ranked_matches(request.user, limit=<span class="nb">20</span>)]
+    <span class="kw">return</span> render(request, <span class="st">"matches/match_feed.html"</span>, {<span class="st">"ranked"</span>: ranked})</code></pre>
+
+  <h2>Match Action View (AJAX)</h2>
+  <pre><code><span class="nm">@login_required</span>
+<span class="nm">@require_POST</span>  <span class="cm"># only accept POST requests — reject GET</span>
+<span class="kw">def</span> <span class="fn">match_action</span>(request, user_id):
+    action = request.POST.get(<span class="st">"action"</span>)  <span class="cm"># "like" or "pass"</span>
+    target = get_object_or_404(User, pk=user_id)
+
+    <span class="cm"># Compute score at time of action and save it</span>
+    score = compute_compatibility(profile.preference_dict, target_profile.preference_dict)
+
+    MatchAction.objects.update_or_create(
+        actor=request.user, target=target,
+        defaults={<span class="st">"action"</span>: action, <span class="st">"score"</span>: score},
+    )
+    <span class="kw">return</span> JsonResponse({<span class="st">"ok"</span>: <span class="kw">True</span>})  <span class="cm"># JavaScript receives this</span></code></pre>
+
+  <h2>Group Detail View</h2>
+  <p>The most data-heavy view — loads everything needed for the group workspace:</p>
+  <pre><code><span class="kw">def</span> <span class="fn">group_detail</span>(request, pk):
+    group      = get_object_or_404(TripGroup, pk=pk)
+    membership = GroupMember.objects.filter(group=group, user=request.user).first()
+    is_member  = membership <span class="kw">is not None</span>
+    is_owner   = group.owner == request.user
+
+    <span class="cm"># prefetch_related avoids N+1 queries (loads all activities in 1 SQL query)</span>
+    itinerary_days = ItineraryDay.objects.filter(group=group)\
+                         .prefetch_related(<span class="st">"activities__assignee"</span>)
+    expenses       = Expense.objects.filter(group=group).select_related(<span class="st">"paid_by"</span>)
+    balances       = {b.user: b.net_balance <span class="kw">for</span> b <span class="kw">in</span>
+                      BalanceLedger.objects.filter(group=group).select_related(<span class="st">"user"</span>)}
+    settlement     = compute_group_settlement(group) <span class="kw">if</span> is_member <span class="kw">else</span> []
+
+    <span class="kw">return</span> render(request, <span class="st">"groups/group_detail.html"</span>, {
+        <span class="st">"group"</span>: group, <span class="st">"is_member"</span>: is_member, <span class="st">"is_owner"</span>: is_owner,
+        <span class="st">"itinerary_days"</span>: itinerary_days, <span class="st">"expenses"</span>: expenses,
+        <span class="st">"balances"</span>: balances, <span class="st">"settlement"</span>: settlement,
+        <span class="st">"expense_form"</span>: ExpenseForm(group=group),
+    })</code></pre>
+
+  <h2>Chat Views (AJAX Polling)</h2>
+  <pre><code><span class="kw">def</span> <span class="fn">chat_messages</span>(request, pk):
+    <span class="cm"># JavaScript sends ?since=42 meaning "only give me messages newer than ID 42"</span>
+    since_id = int(request.GET.get(<span class="st">"since"</span>, <span class="nb">0</span>))
+    msgs = Message.objects.filter(group=group, pk__gt=since_id)[:100]
+    <span class="kw">return</span> JsonResponse({<span class="st">"messages"</span>: [m.to_dict() <span class="kw">for</span> m <span class="kw">in</span> msgs]})
+
+<span class="kw">def</span> <span class="fn">chat_send</span>(request, pk):
+    body = request.POST.get(<span class="st">"body"</span>, <span class="st">""</span>).strip()
+    msg  = Message.objects.create(group=group, sender=request.user, body=body)
+    <span class="kw">return</span> JsonResponse({<span class="st">"ok"</span>: <span class="kw">True</span>, <span class="st">"message"</span>: msg.to_dict()})</code></pre>
+
+  <h2>Expense Create View (Most Complex)</h2>
+  <pre><code><span class="kw">def</span> <span class="fn">expense_create</span>(request, pk):
+    member_ids = [m.user_id <span class="kw">for</span> m <span class="kw">in</span> GroupMember.objects.filter(group=group)]
+
+    <span class="kw">if</span> split_type == <span class="st">"equal"</span>:
+        share  = amount / len(member_ids)
+        splits = {uid: share <span class="kw">for</span> uid <span class="kw">in</span> member_ids}
+
+    <span class="cm"># transaction.atomic() = all-or-nothing: if anything fails, nothing is saved</span>
+    <span class="kw">with</span> transaction.atomic():
+        expense = Expense.objects.create(...)
+
+        <span class="kw">for</span> uid, owed <span class="kw">in</span> splits.items():
+            ExpenseAllocation.objects.create(expense=expense, user_id=uid, amount_owed=owed)
+
+            <span class="cm"># Update running balance for this member</span>
+            delta = (amount - owed) <span class="kw">if</span> uid == paid_by.pk <span class="kw">else</span> -owed
+            ledger, _ = BalanceLedger.objects.get_or_create(group=group, user_id=uid,
+                                                             defaults={<span class="st">"net_balance"</span>: <span class="nb">0</span>})
+            ledger.net_balance += delta
+            ledger.save()
+
+    <span class="kw">return</span> JsonResponse({<span class="st">"ok"</span>: <span class="kw">True</span>})</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════ CHAPTER 5 ══ -->
+<div class="page chapter">
+  <div class="chapter-header">
+    <div class="chapter-number">Chapter 5</div>
+    <div class="chapter-title">Forms</div>
+    <div class="chapter-desc">core/forms.py — HTML form definitions, validation logic, and Bootstrap widget styling.</div>
+  </div>
+
+  <div class="filepath">core/forms.py</div>
+
+  <p>Django forms have two jobs: <strong>render HTML</strong> (generate the input fields) and <strong>validate input</strong> (check data before saving). Every form in this file maps to either a model or a standalone process.</p>
+
+  <h2>SignUpForm</h2>
+  <pre><code><span class="kw">class</span> <span class="cl">SignUpForm</span>(UserCreationForm):
+    <span class="cm"># UserCreationForm already has username, password1, password2</span>
+    <span class="cm"># We just add email on top</span>
+    email = forms.EmailField(required=<span class="kw">True</span>)
+
+    <span class="kw">class</span> <span class="cl">Meta</span>:
+        model  = User
+        fields = (<span class="st">"username"</span>, <span class="st">"email"</span>, <span class="st">"password1"</span>, <span class="st">"password2"</span>)
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        <span class="cm"># Apply Bootstrap's form-control class to every field automatically</span>
+        <span class="kw">for</span> field <span class="kw">in</span> self.fields.values():
+            field.widget.attrs[<span class="st">"class"</span>] = <span class="st">"form-control"</span></code></pre>
+
+  <h2>OnboardingForm</h2>
+  <p>The most interesting form — handles multi-select checkboxes for destinations and months:</p>
+  <pre><code><span class="kw">class</span> <span class="cl">OnboardingForm</span>(forms.ModelForm):
+    <span class="cm"># MultipleChoiceField renders as a list of checkboxes</span>
+    destinations = forms.MultipleChoiceField(
+        choices=DESTINATION_CHOICES,         <span class="cm"># [("europe","Europe"), ...]</span>
+        widget=forms.CheckboxSelectMultiple,
+        required=<span class="kw">False</span>,
+    )
+    travel_months = forms.MultipleChoiceField(
+        choices=MONTH_CHOICES,               <span class="cm"># [(1,"January"), (2,"February"), ...]</span>
+        widget=forms.CheckboxSelectMultiple,
+        required=<span class="kw">False</span>,
+    )
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        <span class="kw">if</span> self.instance <span class="kw">and</span> self.instance.pk:
+            <span class="cm"># Pre-tick the checkboxes that were previously saved</span>
+            self.initial[<span class="st">"destinations"</span>]  = self.instance.destinations <span class="kw">or</span> []
+            self.initial[<span class="st">"travel_months"</span>] = [str(m) <span class="kw">for</span> m <span class="kw">in</span> (self.instance.travel_months <span class="kw">or</span> [])]</code></pre>
+
+  <h2>ActivityForm</h2>
+  <p>The assignee dropdown is <strong>dynamic</strong> — it only shows members of the specific group:</p>
+  <pre><code><span class="kw">class</span> <span class="cl">ActivityForm</span>(forms.ModelForm):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, *args, group=<span class="kw">None</span>, **kwargs):
+        super().__init__(*args, **kwargs)
+        <span class="kw">if</span> group:
+            <span class="cm"># Get user IDs who are members of this group</span>
+            member_ids = GroupMember.objects.filter(group=group).values_list(<span class="st">"user_id"</span>, flat=<span class="kw">True</span>)
+            <span class="cm"># Restrict assignee dropdown to only those users</span>
+            self.fields[<span class="st">"assignee"</span>].queryset = User.objects.filter(pk__in=member_ids)
+            self.fields[<span class="st">"assignee"</span>].empty_label = <span class="st">"— No assignee —"</span></code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════ CHAPTER 6 ══ -->
+<div class="page chapter">
+  <div class="chapter-header">
+    <div class="chapter-number">Chapter 6</div>
+    <div class="chapter-title">Matching Algorithm</div>
+    <div class="chapter-desc">core/services/matching.py — The mathematical heart of TravelMatch. How compatibility is scored.</div>
+  </div>
+
+  <div class="filepath">core/services/matching.py</div>
+
+  <p>This file answers: <em>"How similar are two users' travel preferences?"</em> The answer is a number between 0 and 1, where 1 means perfect match.</p>
+
+  <div class="formula">
+    <span class="label">The Compatibility Formula</span>
+    Score(A, B)  =  (budget_sim × 0.35)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+  (destinations_sim × 0.25)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+  (style_sim × 0.20)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+  (duration_sim × 0.12)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+  (accommodation_sim × 0.08)
+  </div>
+
+  <table>
+    <tr><th>Feature</th><th>Weight</th><th>Method</th><th>Logic</th></tr>
+    <tr><td>budget</td><td>35%</td><td>Ordinal similarity</td><td>Exact = 1.0 &nbsp;|&nbsp; One tier apart = 0.5 &nbsp;|&nbsp; Two tiers apart = 0.0</td></tr>
+    <tr><td>destinations</td><td>25%</td><td>Jaccard similarity</td><td>|intersection| ÷ |union| of their destination sets</td></tr>
+    <tr><td>style</td><td>20%</td><td>Custom</td><td>Exact = 1.0 &nbsp;|&nbsp; Either is "mixed" = 0.6 &nbsp;|&nbsp; Different = 0.0</td></tr>
+    <tr><td>duration</td><td>12%</td><td>Ordinal similarity</td><td>Same as budget — weekend/week/twoweeks/extended are ordered tiers</td></tr>
+    <tr><td>accommodation</td><td>8%</td><td>Exact match</td><td>Same preference = 1.0 &nbsp;|&nbsp; Different = 0.0</td></tr>
+  </table>
+
+  <h2>Ordinal Similarity</h2>
+  <p>Used for budget and duration — these are ordered scales where "nearby" values are somewhat compatible:</p>
+  <pre><code><span class="cm"># Budget tiers in order: economy → mid → luxury</span>
+<span class="nm">BUDGET_TIERS</span>   = [<span class="st">"economy"</span>, <span class="st">"mid"</span>, <span class="st">"luxury"</span>]
+<span class="nm">DURATION_TIERS</span> = [<span class="st">"weekend"</span>, <span class="st">"week"</span>, <span class="st">"twoweeks"</span>, <span class="st">"extended"</span>]
+
+<span class="kw">def</span> <span class="fn">_ordinal_sim</span>(val_a, val_b, tiers):
+    dist = abs(tiers.index(val_a) - tiers.index(val_b))
+    <span class="kw">return</span> <span class="nb">1.0</span> <span class="kw">if</span> dist == <span class="nb">0</span> <span class="kw">else</span> (<span class="nb">0.5</span> <span class="kw">if</span> dist == <span class="nb">1</span> <span class="kw">else</span> <span class="nb">0.0</span>)
+
+<span class="cm"># Examples:</span>
+<span class="cm"># economy vs economy → dist=0 → 1.0 (perfect)</span>
+<span class="cm"># economy vs mid     → dist=1 → 0.5 (partial)</span>
+<span class="cm"># economy vs luxury  → dist=2 → 0.0 (no match)</span></code></pre>
+
+  <h2>Jaccard Similarity (Destinations)</h2>
+  <p>Jaccard measures the overlap between two sets. It's ideal for destinations because two people might both want to visit 3 out of 5 of the same regions.</p>
+  <pre><code><span class="kw">def</span> <span class="fn">_jaccard_sim</span>(set_a, set_b):
+    a, b = set(set_a), set(set_b)
+    <span class="kw">if not</span> a <span class="kw">and not</span> b: <span class="kw">return</span> <span class="nb">0.0</span>
+    <span class="kw">return</span> len(a &amp; b) / len(a | b)  <span class="cm"># intersection ÷ union</span>
+
+<span class="cm"># Example:</span>
+<span class="cm"># Alice: ["europe", "east_asia", "caribbean"]</span>
+<span class="cm"># Bob:   ["europe", "east_asia", "africa"]</span>
+<span class="cm"># intersection = {"europe", "east_asia"} → size 2</span>
+<span class="cm"># union        = {"europe","east_asia","caribbean","africa"} → size 4</span>
+<span class="cm"># Jaccard      = 2/4 = 0.50</span></code></pre>
+
+  <h2>Worked Example</h2>
+  <p>Alice (adventure, mid, week, hotel, europe+asia) vs Bob (cultural, mid, week, hotel, europe+americas):</p>
+
+  <pre><code>budget_sim        = ordinal("mid", "mid")           = <span class="nb">1.00</span>
+destinations_sim  = jaccard(["europe","east_asia"],
+                            ["europe","south_america"]) = <span class="nb">1</span>/<span class="nb">3</span> = <span class="nb">0.33</span>
+style_sim         = style("adventure", "cultural")  = <span class="nb">0.00</span>
+duration_sim      = ordinal("week", "week")          = <span class="nb">1.00</span>
+accommodation_sim = "hotel" == "hotel"               = <span class="nb">1.00</span>
+
+Score = (<span class="nb">1.00</span>×<span class="nb">0.35</span>) + (<span class="nb">0.33</span>×<span class="nb">0.25</span>) + (<span class="nb">0.00</span>×<span class="nb">0.20</span>) + (<span class="nb">1.00</span>×<span class="nb">0.12</span>) + (<span class="nb">1.00</span>×<span class="nb">0.08</span>)
+      = <span class="nb">0.35</span> + <span class="nb">0.083</span> + <span class="nb">0.00</span> + <span class="nb">0.12</span> + <span class="nb">0.08</span>
+      = <span class="nb">0.633</span>  →  <span class="nb">63.3</span>% compatible</code></pre>
+
+  <h2>get_ranked_matches()</h2>
+  <pre><code><span class="kw">def</span> <span class="fn">get_ranked_matches</span>(current_user, limit=<span class="nb">20</span>, threshold=<span class="nb">0.0</span>):
+    <span class="cm"># Step 1: find users already acted on (liked or passed)</span>
+    acted_ids = set(MatchAction.objects.filter(actor=current_user)
+                               .values_list(<span class="st">"target_id"</span>, flat=<span class="kw">True</span>))
+    acted_ids.add(current_user.pk)  <span class="cm"># exclude self too</span>
+
+    <span class="cm"># Step 2: get candidates who completed onboarding</span>
+    candidates = User.objects.exclude(pk__in=acted_ids)\
+                             .filter(profile__onboarding_complete=<span class="kw">True</span>)\
+                             .select_related(<span class="st">"profile"</span>)
+
+    <span class="cm"># Step 3: score each candidate</span>
+    results = []
+    <span class="kw">for</span> user <span class="kw">in</span> candidates:
+        score = compute_compatibility(my_pref, user.profile.preference_dict)
+        <span class="kw">if</span> score >= threshold:
+            results.append((user, score))
+
+    <span class="cm"># Step 4: sort descending by score, return top N</span>
+    results.sort(key=<span class="kw">lambda</span> x: x[<span class="nb">1</span>], reverse=<span class="kw">True</span>)
+    <span class="kw">return</span> results[:limit]</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════ CHAPTER 7 ══ -->
+<div class="page chapter">
+  <div class="chapter-header">
+    <div class="chapter-number">Chapter 7</div>
+    <div class="chapter-title">Settlement Algorithm</div>
+    <div class="chapter-desc">core/services/settlement.py — Minimize bank transfers to settle group debts.</div>
+  </div>
+
+  <div class="filepath">core/services/settlement.py</div>
+
+  <p>After a trip, some people are owed money and some owe money. The naive solution is for everyone to pay everyone — which could be many transfers. This algorithm finds the <strong>minimum number of transfers</strong> to settle everything.</p>
+
+  <div class="callout key">
+    <div class="callout-icon">🧮</div>
+    <div class="callout-body">
+      <strong>Mathematical guarantee</strong>
+      For a group of n members, this algorithm always produces at most <strong>n - 1 transfers</strong>, no matter how many expenses were added.
+    </div>
+  </div>
+
+  <h2>The Algorithm</h2>
+  <pre><code><span class="kw">def</span> <span class="fn">compute_settlement</span>(balances: dict) -> list:
+    <span class="cm">"""
+    Input:  {user_id: net_balance}
+            positive balance = others owe this user
+            negative balance = this user owes others
+    Output: [{"from_user": id, "to_user": id, "amount": float}]
+    """</span>
+
+    <span class="cm"># Split into creditors (owed money) and debtors (owe money)</span>
+    creditors = [[uid,  bal] <span class="kw">for</span> uid, bal <span class="kw">in</span> balances.items() <span class="kw">if</span> bal >  EPSILON]
+    debtors   = [[uid, -bal] <span class="kw">for</span> uid, bal <span class="kw">in</span> balances.items() <span class="kw">if</span> bal < -EPSILON]
+
+    <span class="cm"># Sort both by amount (largest first)</span>
+    creditors.sort(key=<span class="kw">lambda</span> x: x[<span class="nb">1</span>], reverse=<span class="kw">True</span>)
+    debtors.sort(key=<span class="kw">lambda</span> x: x[<span class="nb">1</span>], reverse=<span class="kw">True</span>)
+
+    transfers = []
+    ci, di = <span class="nb">0</span>, <span class="nb">0</span>
+
+    <span class="kw">while</span> ci < len(creditors) <span class="kw">and</span> di < len(debtors):
+        cred_id, credit = creditors[ci]
+        debt_id, debt   = debtors[di]
+
+        <span class="cm"># Transfer the smaller of what the creditor is owed vs what the debtor owes</span>
+        amount = min(credit, debt)
+        transfers.append({<span class="st">"from_user"</span>: debt_id, <span class="st">"to_user"</span>: cred_id, <span class="st">"amount"</span>: round(amount, <span class="nb">2</span>)})
+
+        <span class="cm"># Reduce both sides</span>
+        creditors[ci][<span class="nb">1</span>] -= amount
+        debtors[di][<span class="nb">1</span>]   -= amount
+
+        <span class="cm"># If either reaches zero, move to the next person</span>
+        <span class="kw">if</span> creditors[ci][<span class="nb">1</span>] < EPSILON: ci += <span class="nb">1</span>
+        <span class="kw">if</span> debtors[di][<span class="nb">1</span>]   < EPSILON: di += <span class="nb">1</span>
+
+    <span class="kw">return</span> transfers</code></pre>
+
+  <h2>Step-by-Step Example</h2>
+  <p>4 people went on a trip. After all expenses:</p>
+  <table>
+    <tr><th>Person</th><th>Net Balance</th><th>Meaning</th></tr>
+    <tr><td>Alice</td><td>+$120</td><td>Others owe Alice $120</td></tr>
+    <tr><td>Bob</td><td>+$30</td><td>Others owe Bob $30</td></tr>
+    <tr><td>Carol</td><td>-$80</td><td>Carol owes $80</td></tr>
+    <tr><td>Dave</td><td>-$70</td><td>Dave owes $70</td></tr>
+  </table>
+
+  <div class="flow">
+    <span class="flow-step">Step 1</span>  Sort creditors: Alice($120), Bob($30)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sort debtors:   Carol($80), Dave($70)<br><br>
+    <span class="flow-step">Step 2</span>  Match Carol($80) → Alice($120): transfer $80<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Carol settled. Alice now needs $40 more.<br><br>
+    <span class="flow-step">Step 3</span>  Match Dave($70) → Alice($40): transfer $40<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Alice settled. Dave still owes $30.<br><br>
+    <span class="flow-step">Step 4</span>  Match Dave($30) → Bob($30): transfer $30<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Both settled. Done!<br><br>
+    <span class="flow-arrow">Result: 3 transfers instead of potentially 12 (4×3).</span>
+  </div>
+
+  <h2>The Convenience Wrapper</h2>
+  <pre><code><span class="kw">def</span> <span class="fn">compute_group_settlement</span>(group):
+    <span class="cm"># Read balances from BalanceLedger for this group</span>
+    ledger   = BalanceLedger.objects.filter(group=group).select_related(<span class="st">"user"</span>)
+    balances = {entry.user_id: float(entry.net_balance) <span class="kw">for</span> entry <span class="kw">in</span> ledger}
+
+    <span class="cm"># Run the algorithm (returns user IDs)</span>
+    raw = compute_settlement(balances)
+
+    <span class="cm"># Look up actual User objects so templates can show usernames</span>
+    user_map = {u.pk: u <span class="kw">for</span> u <span class="kw">in</span> User.objects.filter(pk__in=balances.keys())}
+    <span class="kw">return</span> [{<span class="st">"from_user"</span>: user_map[t[<span class="st">"from_user"</span>]],
+              <span class="st">"to_user"</span>: user_map[t[<span class="st">"to_user"</span>]],
+              <span class="st">"amount"</span>: t[<span class="st">"amount"</span>]} <span class="kw">for</span> t <span class="kw">in</span> raw]</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════ CHAPTER 8 ══ -->
+<div class="page chapter">
+  <div class="chapter-header">
+    <div class="chapter-number">Chapter 8</div>
+    <div class="chapter-title">Templates — All HTML Pages</div>
+    <div class="chapter-desc">Every template file, what it shows, and how Django's template language works.</div>
+  </div>
+
+  <div class="callout info">
+    <div class="callout-icon">ℹ️</div>
+    <div class="callout-body">
+      <strong>Django Template Language basics</strong>
+      <code>{{ variable }}</code> outputs a value. <code>{% tag %}</code> executes logic (if/for/url/block). <code>{% extends "base.html" %}</code> means "use base.html as the layout and fill in its blocks." <code>{% block content %}...{% endblock %}</code> is the section the child template fills in.
+    </div>
+  </div>
+
+  <h2>base.html — The Master Layout</h2>
+  <p>Every other template extends this. It defines the page structure:</p>
+  <pre><code><span class="cm">&lt;!-- Loads {% load static %} so we can reference CSS/JS files --&gt;</span>
+&lt;head&gt;
+  <span class="cm">&lt;!-- Inter font, Bootstrap 5.3, Bootstrap Icons, SortableJS, travelmatch.css --&gt;</span>
+  &lt;link href="{% static 'css/travelmatch.css' %}" rel="stylesheet" /&gt;
+&lt;/head&gt;
+
+&lt;nav class="navbar tm-navbar sticky-top"&gt;
+  &lt;a href="{% url 'home' %}"&gt;TravelMatch&lt;/a&gt;
+
+  <span class="cm">&lt;!-- Active link detection: adds "active" class if current page matches --&gt;</span>
+  &lt;a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+     href="{% url 'dashboard' %}"&gt;Dashboard&lt;/a&gt;
+&lt;/nav&gt;
+
+&lt;main&gt;
+  <span class="cm">&lt;!-- Flash messages (success/error) from views.py messages.success() --&gt;</span>
+  {% for message in messages %}
+  &lt;div class="alert alert-{{ message.tags }}"&gt;{{ message }}&lt;/div&gt;
+  {% endfor %}
+
+  {% block content %}{% endblock %}  <span class="cm">&lt;!-- child templates fill this in --&gt;</span>
+&lt;/main&gt;
+
+{% block extra_js %}{% endblock %}  <span class="cm">&lt;!-- per-page JavaScript goes here --&gt;</span></code></pre>
+
+  <h2>home.html — Landing Page</h2>
+  <p>Shown to logged-out visitors. Contains the hero section, 4 feature cards, and the "How it works" 3-step section. If the user is already logged in, the view redirects them to dashboard so this page is never shown to them.</p>
+
+  <h2>registration/login.html — Sign In</h2>
+  <p>The login form. Manually writes the username and password inputs with Bootstrap classes, because Django's built-in <code>AuthenticationForm</code> doesn't add Bootstrap classes automatically.</p>
+
+  <h2>auth/signup.html — Sign Up</h2>
+  <p>Uses a for loop over form fields to render each input with its label and any validation errors:</p>
+  <pre><code>{% for field in form %}
+&lt;div class="mb-3"&gt;
+  &lt;label&gt;{{ field.label }}&lt;/label&gt;
+  {{ field }}  <span class="cm">&lt;!-- renders the actual &lt;input&gt; element --&gt;</span>
+  {% if field.errors %}
+  &lt;div class="invalid-feedback d-block"&gt;{{ field.errors|join:", " }}&lt;/div&gt;
+  {% endif %}
+&lt;/div&gt;
+{% endfor %}</code></pre>
+
+  <h2>auth/onboarding.html and auth/profile.html</h2>
+  <p>The travel preference questionnaire. Shows checkboxes for destinations (10 regions) and travel months (12 months). The tricky part is pre-ticking boxes when editing existing preferences:</p>
+  <pre><code><span class="cm">&lt;!-- Checkbox ticked if this value exists in the user's saved list --&gt;</span>
+&lt;input type="checkbox" name="destinations" value="{{ value }}"
+  {% if value in form.initial.destinations %}checked{% endif %}&gt;</code></pre>
+
+  <h2>dashboard.html</h2>
+  <p>Two-column layout after login. Left column shows group cards; right column shows the top 3 compatibility matches with progress bars:</p>
+  <pre><code><span class="cm">&lt;!-- Progress bar width = compatibility score (0–100) --&gt;</span>
+&lt;div class="progress-bar" style="width:{{ score|floatformat:0 }}%"&gt;&lt;/div&gt;
+&lt;span&gt;{{ score|floatformat:0 }}%&lt;/span&gt;</code></pre>
+
+  <h2>matches/match_feed.html</h2>
+  <p>The discover page. Each match renders as a card. Like/Pass buttons use JavaScript to AJAX-submit and animate the card away without a page reload:</p>
+  <pre><code><span class="cm">// JavaScript in the template</span>
+document.querySelectorAll(<span class="st">'.match-action-btn'</span>).forEach(btn => {
+  btn.addEventListener(<span class="st">'click'</span>, <span class="kw">function</span>() {
+    <span class="kw">const</span> fd = <span class="kw">new</span> FormData();
+    fd.append(<span class="st">'action'</span>, <span class="kw">this</span>.dataset.action);  <span class="cm">// "like" or "pass"</span>
+    fd.append(<span class="st">'csrfmiddlewaretoken'</span>, csrfToken);
+
+    fetch(<span class="st">`/matches/${userId}/action/`</span>, {method: <span class="st">'POST'</span>, body: fd})
+      .then(r => r.json())
+      .then(data => {
+        <span class="kw">if</span> (data.ok) card.style.opacity = <span class="st">'0'</span>;  <span class="cm">// fade out</span>
+        setTimeout(() => card.remove(), <span class="nb">300</span>);    <span class="cm">// remove after animation</span>
+      });
+  });
+});</code></pre>
+
+  <h2>groups/group_detail.html — The Big One</h2>
+  <p>This template has 4 Bootstrap tabs: Chat, Itinerary, Expenses, Members.</p>
+
+  <h3>Chat Tab</h3>
+  <p>Shows past messages on load. JavaScript polls every 2 seconds for new ones:</p>
+  <pre><code><span class="kw">let</span> lastId = <span class="nb">0</span>;  <span class="cm">// tracks last message ID seen</span>
+
+<span class="kw">async function</span> <span class="fn">fetchMessages</span>() {
+  <span class="kw">const</span> r    = <span class="kw">await</span> fetch(<span class="st">`/groups/${groupPk}/chat/messages/?since=${lastId}`</span>);
+  <span class="kw">const</span> data = <span class="kw">await</span> r.json();
+  data.messages.forEach(msg => {
+    lastId = Math.max(lastId, msg.id);  <span class="cm">// update cursor</span>
+    chatBox.appendChild(renderMessage(msg, isSelf));
+  });
+}
+setInterval(fetchMessages, <span class="nb">2000</span>);  <span class="cm">// poll every 2 seconds</span></code></pre>
+
+  <h3>Itinerary Tab</h3>
+  <p>Day cards with sortable activity lists. SortableJS handles the drag-drop and calls the server to save the new order:</p>
+  <pre><code><span class="kw">new</span> Sortable(list, {
+  animation: <span class="nb">150</span>,
+  handle: <span class="st">'.bi-grip-vertical'</span>,  <span class="cm">// only drag by the grip icon</span>
+  onEnd: <span class="kw">async</span> () => {
+    <span class="kw">const</span> ids = [...list.querySelectorAll(<span class="st">'[data-activity-id]'</span>)]
+                    .map(el => parseInt(el.dataset.activityId));
+    <span class="cm">// Send new order to server</span>
+    <span class="kw">await</span> fetch(<span class="st">`/groups/${groupPk}/itinerary/reorder/`</span>, {
+      method: <span class="st">'POST'</span>,
+      headers: {<span class="st">'Content-Type'</span>: <span class="st">'application/json'</span>, <span class="st">'X-CSRFToken'</span>: csrfToken},
+      body: JSON.stringify({ordered_ids: ids}),
+    });
+  },
+});</code></pre>
+
+  <h3>Expenses Tab</h3>
+  <p>Shows expense list, per-member balances (green if owed, red if owing), and the settlement plan showing minimum transfers needed.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════ CHAPTER 9 ══ -->
+<div class="page chapter">
+  <div class="chapter-header">
+    <div class="chapter-number">Chapter 9</div>
+    <div class="chapter-title">Static Files — CSS &amp; JavaScript</div>
+    <div class="chapter-desc">travelmatch.css and travelmatch.js — The design system and global behaviour.</div>
+  </div>
+
+  <div class="filepath">static/css/travelmatch.css</div>
+  <p>This file <strong>customizes Bootstrap</strong> to use TravelMatch's indigo/violet color palette and adds project-specific components. It uses CSS custom properties (variables) so you can change the primary color in one place.</p>
+
+  <pre><code><span class="cm">/* Override Bootstrap's default blue with indigo-violet */</span>
+:root {
+  --tm-primary:     #<span class="nb">6366</span>f1;   <span class="cm">/* main indigo */</span>
+  --tm-primary-dark:#<span class="nb">4</span>f46e5;   <span class="cm">/* darker for hover states */</span>
+  --bs-primary:     #<span class="nb">6366</span>f1;   <span class="cm">/* Bootstrap reads this variable! */</span>
+  --bs-primary-rgb: <span class="nb">99</span>, <span class="nb">102</span>, <span class="nb">241</span>;
+}
+
+<span class="cm">/* Recolor all .btn-primary buttons */</span>
+.btn-primary {
+  --bs-btn-bg:       #<span class="nb">6366</span>f1;
+  --bs-btn-hover-bg: #<span class="nb">4</span>f46e5;
+  font-weight: <span class="nb">500</span>;
+  border-radius: .<span class="nb">5</span>rem;
+}
+
+<span class="cm">/* Active nav links get an indigo highlight */</span>
+.tm-navbar .nav-link:hover,
+.tm-navbar .nav-link.active {
+  background: rgba(<span class="nb">99</span>,<span class="nb">102</span>,<span class="nb">241</span>,.<span class="nb">08</span>);
+  color: var(--tm-primary);
+}
+
+<span class="cm">/* Active tab gets an indigo underline */</span>
+.nav-tabs .nav-link.active {
+  color: var(--tm-primary);
+  border-bottom: <span class="nb">2</span>px solid var(--tm-primary);
+}
+
+<span class="cm">/* Drag-drop ghost element (while dragging) */</span>
+.sortable-ghost {
+  opacity: .<span class="nb">4</span>;
+  background: #e0e7ff;  <span class="cm">/* light indigo tint */</span>
+}</code></pre>
+
+  <div class="divider"></div>
+
+  <div class="filepath">static/js/travelmatch.js</div>
+  <p>Intentionally minimal — only contains global behavior that applies to every page. Per-page logic (chat polling, drag-drop, expense forms) lives in <code>{% block extra_js %}</code> within each template to keep related code together.</p>
+
+  <pre><code><span class="cm">/* Auto-dismiss flash messages after 5 seconds */</span>
+document.addEventListener(<span class="st">'DOMContentLoaded'</span>, <span class="kw">function</span>() {
+  document.querySelectorAll(<span class="st">'.alert.alert-dismissible'</span>).forEach(<span class="kw">function</span>(el) {
+    setTimeout(<span class="kw">function</span>() {
+      <span class="kw">const</span> bsAlert = bootstrap.Alert.getOrCreateInstance(el);
+      bsAlert.close();
+    }, <span class="nb">5000</span>);  <span class="cm">// 5000ms = 5 seconds</span>
+  });
+});</code></pre>
+
+  <p>Bootstrap's <code>Alert.close()</code> method triggers the CSS fade-out animation before removing the element — so the alert doesn't just disappear abruptly.</p>
+
+  <div class="callout tip">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body">
+      <strong>CSRF tokens in AJAX requests</strong>
+      Every POST request in Django must include a CSRF token to prevent cross-site request forgery attacks. In the templates, we include a hidden form <code>&lt;form id="csrf-form"&gt;{% csrf_token %}&lt;/form&gt;</code> and JavaScript reads the token from it: <code>document.querySelector('#csrf-form [name=csrfmiddlewaretoken]').value</code>. This is appended to every AJAX POST.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ CHAPTER 10 ══ -->
+<div class="page chapter">
+  <div class="chapter-header">
+    <div class="chapter-number">Chapter 10</div>
+    <div class="chapter-title">How Everything Connects</div>
+    <div class="chapter-desc">End-to-end flows showing how all the files work together for each major feature.</div>
+  </div>
+
+  <h2>Flow 1: User Signs Up</h2>
+  <div class="flow">
+    <span class="flow-step">1.</span> Browser visits /accounts/signup/<br>
+    <span class="flow-arrow">→</span> urls.py routes to <b>signup_view()</b> in views.py<br><br>
+    <span class="flow-step">2.</span> GET request: view creates empty <b>SignUpForm</b><br>
+    <span class="flow-arrow">→</span> renders auth/signup.html with the form<br><br>
+    <span class="flow-step">3.</span> User fills form and submits (POST)<br>
+    <span class="flow-arrow">→</span> SignUpForm validates: username unique? passwords match? email valid?<br><br>
+    <span class="flow-step">4.</span> If valid: <b>User</b> created with hashed password<br>
+    <span class="flow-arrow">→</span> <b>Profile</b> created (blank) for that User<br>
+    <span class="flow-arrow">→</span> User logged in automatically<br>
+    <span class="flow-arrow">→</span> Redirect to /onboarding/<br><br>
+    <span class="flow-step">5.</span> Onboarding form shown, user fills preferences<br>
+    <span class="flow-arrow">→</span> Profile.destinations, travel_months, style, budget, etc. saved<br>
+    <span class="flow-arrow">→</span> onboarding_complete = True<br>
+    <span class="flow-arrow">→</span> Redirect to /matches/<br>
+  </div>
+
+  <h2>Flow 2: Compatibility Matching</h2>
+  <div class="flow">
+    <span class="flow-step">1.</span> User visits /matches/<br>
+    <span class="flow-arrow">→</span> match_feed() called<br><br>
+    <span class="flow-step">2.</span> services/matching.py: get_ranked_matches(user)<br>
+    <span class="flow-arrow">→</span> Queries all users with onboarding_complete=True<br>
+    <span class="flow-arrow">→</span> Excludes already-acted-on users (via MatchAction table)<br><br>
+    <span class="flow-step">3.</span> For each candidate: compute_compatibility(my_prefs, their_prefs)<br>
+    <span class="flow-arrow">→</span> Runs _ordinal_sim, _jaccard_sim, _style_sim<br>
+    <span class="flow-arrow">→</span> Returns weighted sum score (0.0–1.0)<br><br>
+    <span class="flow-step">4.</span> Sort by score descending, take top 20<br>
+    <span class="flow-arrow">→</span> Multiply by 100 (for "%" display)<br>
+    <span class="flow-arrow">→</span> Render matches/match_feed.html<br><br>
+    <span class="flow-step">5.</span> User clicks "Like" on a card<br>
+    <span class="flow-arrow">→</span> JavaScript POSTs to /matches/&lt;id&gt;/action/<br>
+    <span class="flow-arrow">→</span> match_action() saves MatchAction(actor, target, "like", score)<br>
+    <span class="flow-arrow">→</span> Returns JSON {ok: true}<br>
+    <span class="flow-arrow">→</span> JavaScript fades out and removes the card<br>
+  </div>
+
+  <h2>Flow 3: Real-Time Chat</h2>
+  <div class="flow">
+    <span class="flow-step">1.</span> User opens group_detail.html (Chat tab is default)<br>
+    <span class="flow-arrow">→</span> Django renders all existing messages server-side<br><br>
+    <span class="flow-step">2.</span> JavaScript starts polling loop (every 2 seconds):<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;fetch("/groups/&lt;pk&gt;/chat/messages/?since=&lt;lastId&gt;")<br>
+    <span class="flow-arrow">→</span> chat_messages() view returns only NEW messages<br>
+    <span class="flow-arrow">→</span> JavaScript renders them and updates lastId cursor<br><br>
+    <span class="flow-step">3.</span> User types message + presses Enter<br>
+    <span class="flow-arrow">→</span> JavaScript POSTs to /groups/&lt;pk&gt;/chat/send/<br>
+    <span class="flow-arrow">→</span> chat_send() creates Message in DB<br>
+    <span class="flow-arrow">→</span> Returns the message as JSON<br>
+    <span class="flow-arrow">→</span> JavaScript immediately renders it in the chat box<br>
+    <span class="flow-arrow">→</span> Other users' polling picks it up within 2 seconds<br>
+  </div>
+
+  <h2>Flow 4: Adding an Expense</h2>
+  <div class="flow">
+    <span class="flow-step">1.</span> User clicks "Add Expense" → modal opens with ExpenseForm<br><br>
+    <span class="flow-step">2.</span> User fills in: description, amount $120, currency USD, split=equal<br>
+    <span class="flow-arrow">→</span> JavaScript submits form via fetch() to /groups/&lt;pk&gt;/expenses/add/<br><br>
+    <span class="flow-step">3.</span> expense_create() view:<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;- Gets all 3 group member IDs<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;- Calculates equal share: $120 ÷ 3 = $40 each<br><br>
+    <span class="flow-step">4.</span> Inside transaction.atomic() (all-or-nothing):<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;- Creates Expense record ($120)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;- Creates 3 ExpenseAllocation rows ($40 each)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;- Updates BalanceLedger for each member:<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;payer: net_balance += (120 - 40) = +$80<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;others: net_balance += (0 - 40) = -$40 each<br><br>
+    <span class="flow-step">5.</span> Returns {ok: true} → page reloads to show updated list<br>
+  </div>
+
+  <h2>Flow 5: Settlement Plan</h2>
+  <div class="flow">
+    <span class="flow-step">1.</span> Expenses tab loads → group_detail() reads BalanceLedger<br>
+    <span class="flow-arrow">→</span> Calls compute_group_settlement(group)<br><br>
+    <span class="flow-step">2.</span> settlement.py reads net balances from BalanceLedger<br>
+    <span class="flow-arrow">→</span> Splits into creditors (+) and debtors (-)<br>
+    <span class="flow-arrow">→</span> Greedy algorithm matches largest creditor with largest debtor<br>
+    <span class="flow-arrow">→</span> Produces minimum transfer list<br><br>
+    <span class="flow-step">3.</span> Template renders: "Carol pays Alice $80" etc.<br>
+    <span class="flow-arrow">→</span> Color coded: red = payer, green = receiver<br>
+  </div>
+
+  <h2>The Django ORM Cheat Sheet</h2>
+  <p>These are the database query patterns used throughout views.py:</p>
+  <table>
+    <tr><th>Code</th><th>SQL equivalent</th></tr>
+    <tr><td><code>Profile.objects.get(user=request.user)</code></td><td>SELECT * WHERE user_id = ? (returns one row)</td></tr>
+    <tr><td><code>TripGroup.objects.filter(owner=user)</code></td><td>SELECT * WHERE owner_id = ? (returns many)</td></tr>
+    <tr><td><code>TripGroup.objects.exclude(pk__in=ids)</code></td><td>SELECT * WHERE id NOT IN (...)</td></tr>
+    <tr><td><code>Profile.objects.get_or_create(user=u)</code></td><td>SELECT; INSERT if not found</td></tr>
+    <tr><td><code>MatchAction.objects.update_or_create(...)</code></td><td>UPDATE if exists, INSERT if not (upsert)</td></tr>
+    <tr><td><code>.select_related("user")</code></td><td>JOIN — fetches related row in same query</td></tr>
+    <tr><td><code>.prefetch_related("activities")</code></td><td>Separate query, cached — avoids N+1 for lists</td></tr>
+    <tr><td><code>expense.delete()</code></td><td>DELETE FROM expenses WHERE id = ?</td></tr>
+  </table>
+
+  <div class="callout tip">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body">
+      <strong>To run the project</strong><br>
+      1. <code>source .venv/bin/activate</code> — activate virtual environment<br>
+      2. <code>python manage.py migrate</code> — set up the database<br>
+      3. <code>python manage.py runserver</code> — start the server<br>
+      4. Open <code>http://127.0.0.1:8000</code> in your browser
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

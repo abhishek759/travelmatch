@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TravelMatch — Vision, Deployment & Future Roadmap</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    line-height: 1.8;
+    color: #1e293b;
+    background: #fff;
+  }
+
+  /* ── Cover ── */
+  .cover {
+    page-break-after: always;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover-top {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 60px 60px;
+    text-align: center;
+    color: white;
+    position: relative;
+  }
+  .cover-top::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(99,102,241,0.3) 0%, transparent 70%);
+  }
+  .cover-top::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -80px;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(139,92,246,0.25) 0%, transparent 70%);
+  }
+  .cover-badge {
+    background: rgba(99,102,241,0.2);
+    border: 1px solid rgba(99,102,241,0.5);
+    border-radius: 999px;
+    padding: 6px 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #a5b4fc;
+    margin-bottom: 28px;
+    position: relative; z-index: 1;
+  }
+  .cover-title {
+    font-size: 58px; font-weight: 900;
+    letter-spacing: -2px; line-height: 1.05;
+    margin-bottom: 16px;
+    position: relative; z-index: 1;
+  }
+  .cover-title span { color: #818cf8; }
+  .cover-subtitle {
+    font-size: 18px; opacity: 0.7; font-weight: 400;
+    max-width: 520px; line-height: 1.6;
+    position: relative; z-index: 1;
+    margin-bottom: 48px;
+  }
+  .cover-stats {
+    display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;
+    position: relative; z-index: 1;
+  }
+  .stat { text-align: center; }
+  .stat-num { font-size: 32px; font-weight: 800; color: #818cf8; }
+  .stat-label { font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; }
+
+  .cover-bottom {
+    background: #f8fafc;
+    padding: 40px 60px;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .cover-section-card {
+    flex: 1; min-width: 160px;
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .cover-section-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .cover-section-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+  .cover-section-card p { font-size: 11px; color: #64748b; line-height: 1.4; }
+
+  /* ── Page ── */
+  .page { max-width: 860px; margin: 0 auto; padding: 56px 64px; }
+
+  /* ── Chapter header ── */
+  .chapter { page-break-before: always; }
+  .ch-hero {
+    border-radius: 16px; padding: 36px 40px; margin-bottom: 36px;
+    color: white; position: relative; overflow: hidden;
+  }
+  .ch-hero::before {
+    content: '';
+    position: absolute; top: -30px; right: -30px;
+    width: 200px; height: 200px; border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+  }
+  .ch-num { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.7; margin-bottom: 6px; }
+  .ch-title { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; position: relative; }
+  .ch-desc { margin-top: 8px; opacity: 0.8; font-size: 14px; max-width: 600px; position: relative; }
+
+  .bg-indigo   { background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+  .bg-emerald  { background: linear-gradient(135deg, #059669, #0891b2); }
+  .bg-amber    { background: linear-gradient(135deg, #d97706, #dc2626); }
+  .bg-violet   { background: linear-gradient(135deg, #7c3aed, #db2777); }
+  .bg-slate    { background: linear-gradient(135deg, #334155, #1e293b); }
+
+  /* ── Typography ── */
+  h2 { font-size: 19px; font-weight: 700; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; margin: 32px 0 14px; }
+  h3 { font-size: 15px; font-weight: 700; color: #4f46e5; margin: 24px 0 10px; }
+  h4 { font-size: 13.5px; font-weight: 600; color: #1e293b; margin: 16px 0 6px; }
+  p  { margin-bottom: 12px; }
+
+  /* ── Cards grid ── */
+  .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 14px 0 24px; }
+  .card-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .card {
+    background: #f8fafc; border: 1px solid #e2e8f0;
+    border-radius: 12px; padding: 18px;
+    page-break-inside: avoid;
+  }
+  .card-icon { font-size: 24px; margin-bottom: 8px; }
+  .card h4 { margin: 0 0 6px; color: #1e293b; font-size: 13px; }
+  .card p { font-size: 12px; color: #64748b; margin: 0; line-height: 1.5; }
+  .card.highlight { background: linear-gradient(135deg, #ede9fe, #e0e7ff); border-color: #c4b5fd; }
+  .card.success   { background: #f0fdf4; border-color: #bbf7d0; }
+  .card.warning   { background: #fffbeb; border-color: #fde68a; }
+  .card.danger    { background: #fef2f2; border-color: #fecaca; }
+
+  /* ── Feature list ── */
+  .feature-list { list-style: none; padding: 0; margin: 14px 0; }
+  .feature-list li {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid #f1f5f9;
+    font-size: 13px;
+  }
+  .feature-list li:last-child { border-bottom: none; }
+  .fi { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; margin-top: 1px; }
+  .fi.done  { background: #dcfce7; }
+  .fi.next  { background: #ede9fe; }
+  .fi.soon  { background: #dbeafe; }
+  .fi.later { background: #fef3c7; }
+
+  /* ── Step list ── */
+  .steps { margin: 14px 0 24px; }
+  .step {
+    display: flex; gap: 16px; margin-bottom: 20px;
+    page-break-inside: avoid;
+  }
+  .step-num {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white; font-weight: 700; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .step-body h4 { margin: 0 0 4px; font-size: 14px; }
+  .step-body p  { margin: 0; font-size: 12.5px; color: #475569; line-height: 1.6; }
+
+  /* ── Code block ── */
+  pre {
+    background: #0f172a; color: #e2e8f0;
+    border-radius: 10px; padding: 16px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; line-height: 1.7;
+    margin: 12px 0 18px; page-break-inside: avoid;
+    border: 1px solid #1e293b;
+  }
+  code {
+    font-family: 'JetBrains Mono', monospace; font-size: 11.5px;
+    background: #f1f5f9; border: 1px solid #e2e8f0;
+    border-radius: 4px; padding: 1px 6px; color: #6366f1;
+  }
+  pre code { background: none; border: none; color: inherit; padding: 0; font-size: inherit; }
+  .kw { color: #c084fc; } .st { color: #86efac; } .cm { color: #64748b; font-style: italic; }
+  .fn { color: #67e8f9; } .nb { color: #fb923c; } .cl { color: #fbbf24; }
+
+  /* ── Callouts ── */
+  .callout {
+    border-radius: 10px; padding: 14px 18px; margin: 14px 0;
+    font-size: 12.5px; page-break-inside: avoid;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .ci { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .cb { flex: 1; }
+  .cb strong { display: block; margin-bottom: 3px; font-size: 13px; }
+  .info { background: #eff6ff; border-left: 4px solid #3b82f6; }
+  .tip  { background: #f0fdf4; border-left: 4px solid #22c55e; }
+  .warn { background: #fffbeb; border-left: 4px solid #f59e0b; }
+  .key  { background: #faf5ff; border-left: 4px solid #8b5cf6; }
+  .danger-box { background: #fef2f2; border-left: 4px solid #ef4444; }
+
+  /* ── Table ── */
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin: 14px 0 20px; page-break-inside: avoid; }
+  th { background: #1e293b; color: white; padding: 9px 14px; text-align: left; font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  th:first-child { border-radius: 8px 0 0 0; } th:last-child { border-radius: 0 8px 0 0; }
+  td { padding: 9px 14px; border-bottom: 1px solid #f1f5f9; vertical-align: top; line-height: 1.5; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  tr:last-child td { border-bottom: none; }
+
+  /* ── Timeline ── */
+  .timeline { margin: 16px 0 24px; }
+  .tl-item { display: flex; gap: 16px; margin-bottom: 0; position: relative; }
+  .tl-item::before { content: ''; position: absolute; left: 15px; top: 32px; bottom: -8px; width: 2px; background: #e2e8f0; }
+  .tl-item:last-child::before { display: none; }
+  .tl-dot {
+    width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: white; margin-top: 2px;
+    position: relative; z-index: 1;
+  }
+  .tl-body { flex: 1; padding-bottom: 24px; }
+  .tl-body h4 { margin: 4px 0 4px; font-size: 14px; }
+  .tl-body .tl-when { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+  .tl-body p { font-size: 12.5px; color: #475569; margin: 6px 0 0; line-height: 1.6; }
+  .tl-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .tl-tag { background: #f1f5f9; border-radius: 999px; padding: 2px 10px; font-size: 11px; color: #64748b; border: 1px solid #e2e8f0; }
+
+  /* ── Comparison table ── */
+  .comp-head th { background: #6366f1; }
+  .comp-check { color: #22c55e; font-size: 16px; }
+  .comp-cross { color: #ef4444; font-size: 16px; }
+  .comp-partial { color: #f59e0b; font-size: 14px; }
+
+  /* ── Divider ── */
+  .divider { height: 3px; background: linear-gradient(90deg, #6366f1, #8b5cf6, transparent); border-radius: 2px; margin: 28px 0; }
+
+  /* ── Pill ── */
+  .pill { display: inline-block; border-radius: 999px; padding: 2px 10px; font-size: 11px; font-weight: 600; }
+  .pill-indigo { background: #ede9fe; color: #6d28d9; }
+  .pill-green  { background: #dcfce7; color: #166534; }
+  .pill-amber  { background: #fef3c7; color: #92400e; }
+  .pill-red    { background: #fee2e2; color: #991b1b; }
+  .pill-blue   { background: #dbeafe; color: #1e40af; }
+
+  /* ── Big quote ── */
+  .big-quote {
+    font-size: 22px; font-weight: 700; line-height: 1.5;
+    color: #1e293b; text-align: center; padding: 32px;
+    background: linear-gradient(135deg, #f8f7ff, #eff6ff);
+    border-radius: 16px; margin: 24px 0; position: relative;
+  }
+  .big-quote::before { content: '"'; font-size: 80px; line-height: 0; color: #6366f1; opacity: 0.15; position: absolute; top: 40px; left: 24px; font-family: Georgia, serif; }
+
+  /* ── Print ── */
+  @media print {
+    body { font-size: 12px; }
+    .page { padding: 40px 48px; }
+    pre { font-size: 10px; }
+    .cover-title { font-size: 46px; }
+  }
+
+  ul, ol { padding-left: 22px; margin-bottom: 14px; }
+  li { margin-bottom: 5px; }
+  ul li::marker { color: #6366f1; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ COVER ══ -->
+<div class="cover">
+  <div class="cover-top">
+    <div class="cover-badge">Product Vision Document</div>
+    <h1 class="cover-title">Travel<span>Match</span></h1>
+    <p class="cover-subtitle">What the platform does today, how to take it live on the internet, and a complete roadmap for turning it into a world-class travel product.</p>
+    <div class="cover-stats">
+      <div class="stat"><div class="stat-num">5</div><div class="stat-label">Core Features</div></div>
+      <div class="stat"><div class="stat-num">3</div><div class="stat-label">Deployment Options</div></div>
+      <div class="stat"><div class="stat-num">20+</div><div class="stat-label">Future Features</div></div>
+      <div class="stat"><div class="stat-num">4</div><div class="stat-label">Roadmap Phases</div></div>
+    </div>
+  </div>
+  <div class="cover-bottom">
+    <div class="cover-section-card">
+      <div class="cover-section-icon" style="background:#ede9fe;">🎯</div>
+      <div>
+        <h4>What It Does</h4>
+        <p>Current platform capabilities and how each feature works for users</p>
+      </div>
+    </div>
+    <div class="cover-section-card">
+      <div class="cover-section-icon" style="background:#dcfce7;">🚀</div>
+      <div>
+        <h4>Going Live</h4>
+        <p>Step-by-step guide to publishing on Railway, Render, and a custom domain</p>
+      </div>
+    </div>
+    <div class="cover-section-card">
+      <div class="cover-section-icon" style="background:#dbeafe;">🔧</div>
+      <div>
+        <h4>Improvements</h4>
+        <p>Technical upgrades: real-time WebSockets, maps, AI matching, performance</p>
+      </div>
+    </div>
+    <div class="cover-section-card">
+      <div class="cover-section-icon" style="background:#fef3c7;">🌍</div>
+      <div>
+        <h4>Future Roadmap</h4>
+        <p>4-phase plan from MVP polish to mobile app to monetization</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ CHAPTER 1 ══ -->
+<div class="page chapter">
+  <div class="ch-hero bg-indigo">
+    <div class="ch-num">Chapter 1</div>
+    <h1 class="ch-title">What TravelMatch Is & Does Today</h1>
+    <p class="ch-desc">A clear picture of every feature currently working in the platform and the real value it delivers to users.</p>
+  </div>
+
+  <div class="big-quote">
+    TravelMatch connects solo travelers who share the same style, budget, and destinations — so they can plan, coordinate, and split costs together.
+  </div>
+
+  <h2>The Problem It Solves</h2>
+  <p>Solo travel is growing fast but it has a core problem: finding someone <em>compatible</em> to travel with is hard. Generic social platforms don't understand travel. Travel apps don't have a social layer. Group chats on WhatsApp don't track who paid for what. TravelMatch puts all of this in one place — finding the right person, planning the trip, and handling money fairly.</p>
+
+  <h2>Five Live Features</h2>
+
+  <h3>1. Smart Compatibility Matching</h3>
+  <p>When you sign up, you fill in a travel profile: your budget range, travel style, preferred destinations, trip length, and accommodation type. TravelMatch then runs a <strong>weighted scoring algorithm</strong> across every other user on the platform and ranks them by how well they match you.</p>
+  <div class="card-grid three">
+    <div class="card highlight">
+      <div class="card-icon">💰</div>
+      <h4>Budget (35%)</h4>
+      <p>Most important factor. Economy, Mid-range, or Luxury. Adjacent tiers score 50%.</p>
+    </div>
+    <div class="card highlight">
+      <div class="card-icon">🗺</div>
+      <h4>Destinations (25%)</h4>
+      <p>Overlap between your dream regions. Uses Jaccard similarity for fairness.</p>
+    </div>
+    <div class="card highlight">
+      <div class="card-icon">🧭</div>
+      <h4>Style (20%)</h4>
+      <p>Adventure, Cultural, Relaxation, or Mixed. "Mixed" scores well with everyone.</p>
+    </div>
+    <div class="card highlight">
+      <div class="card-icon">📅</div>
+      <h4>Duration (12%)</h4>
+      <p>Weekend, One Week, Two Weeks, or Extended trip preference.</p>
+    </div>
+    <div class="card highlight">
+      <div class="card-icon">🏨</div>
+      <h4>Accommodation (8%)</h4>
+      <p>Hostel, Airbnb, or Hotel. Exact match required for full score.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">👁</div>
+      <h4>Like / Pass</h4>
+      <p>Swipe-style cards. Passed users never appear again. Liked users are tracked.</p>
+    </div>
+  </div>
+
+  <h3>2. Trip Group Management</h3>
+  <p>Any user can create a trip group with a destination, dates, and description. Groups are private — joinable only with a <strong>10-character invite code</strong> that only the owner can share. The owner can add members by username, remove members, and the group can hold up to 12 people.</p>
+
+  <h3>3. Real-Time Group Chat</h3>
+  <p>Every group has a dedicated chat room. Messages appear live for all members using <strong>AJAX polling</strong> — the browser checks for new messages every 2 seconds without requiring a page refresh. Each message shows who sent it, the time, and is styled differently for your own messages vs others.</p>
+
+  <h3>4. Collaborative Itinerary Planning</h3>
+  <p>Groups can build a shared day-by-day plan. Any member can add days (with a title and date) and activities within each day (with times, location, notes, and an assignee). Activities can be <strong>drag-and-reordered</strong> by any member and the order is saved instantly.</p>
+
+  <h3>5. Shared Expense Tracking & Settlement</h3>
+  <p>Track every shared cost — who paid, how much, and how to split it. Three split modes are supported: <strong>equal split</strong> (everyone pays the same), <strong>exact split</strong> (specify each person's share), and <strong>percentage split</strong>. The platform then automatically calculates the <strong>minimum number of bank transfers</strong> needed to settle all debts.</p>
+
+  <div class="callout tip">
+    <div class="ci">✅</div>
+    <div class="cb">
+      <strong>What makes the settlement smart</strong>
+      If 4 people have $150 in debts between them, a naive approach might require 6 transfers. TravelMatch's greedy algorithm settles it in at most 3 (n-1 transfers for n people). This is mathematically optimal.
+    </div>
+  </div>
+
+  <h2>Who Uses It & Why</h2>
+  <table>
+    <tr><th>User Type</th><th>What They Use</th><th>Why It Helps</th></tr>
+    <tr><td>Solo traveler looking for company</td><td>Match feed, profile, like/pass</td><td>Finds compatible companions without awkward Facebook posts</td></tr>
+    <tr><td>Group trip organizer</td><td>Group creation, invite codes, itinerary</td><td>One app for planning — no juggling Google Docs + WhatsApp</td></tr>
+    <tr><td>Friend group on a trip</td><td>Chat, expenses, settlement</td><td>No more arguing about who owes who — auto-calculated</td></tr>
+    <tr><td>Frequent traveler</td><td>All features</td><td>Builds a network of trusted travel companions over time</td></tr>
+  </table>
+
+  <h2>Current Technical Scope</h2>
+  <table>
+    <tr><th>Area</th><th>Current Implementation</th></tr>
+    <tr><td>Backend</td><td>Django 4.2 (Python) — all logic server-side</td></tr>
+    <tr><td>Database</td><td>SQLite — single file, works locally, no setup needed</td></tr>
+    <tr><td>Real-time</td><td>AJAX polling every 2 seconds — works without WebSockets</td></tr>
+    <tr><td>Authentication</td><td>Django's built-in session auth — secure, cookie-based</td></tr>
+    <tr><td>Frontend</td><td>Bootstrap 5.3 + custom CSS + vanilla JavaScript</td></tr>
+    <tr><td>Hosting</td><td>Local only (python manage.py runserver)</td></tr>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════ CHAPTER 2 ══ -->
+<div class="page chapter">
+  <div class="ch-hero bg-emerald">
+    <div class="ch-num">Chapter 2</div>
+    <h1 class="ch-title">How to Publish the Website</h1>
+    <p class="ch-desc">A complete, step-by-step guide to taking TravelMatch from your laptop to the internet — free options included.</p>
+  </div>
+
+  <p>Right now TravelMatch runs only on your computer. To make it accessible at a real URL (like <code>travelmatch.com</code>) you need to deploy it to a server. Here's everything you need to do — from easiest to most professional.</p>
+
+  <div class="callout info">
+    <div class="ci">ℹ️</div>
+    <div class="cb">
+      <strong>Before deploying: 4 things to change in settings.py</strong>
+      These are required for any production deployment — they prevent security vulnerabilities.
+    </div>
+  </div>
+
+  <pre><code><span class="cm"># 1. Turn off debug mode (never expose error details publicly)</span>
+DEBUG = <span class="kw">False</span>
+
+<span class="cm"># 2. Set your domain (replace with your actual domain)</span>
+ALLOWED_HOSTS = [<span class="st">"travelmatch.railway.app"</span>, <span class="st">"www.yourdomain.com"</span>]
+
+<span class="cm"># 3. Use a real secret key (never hardcode — read from environment variable)</span>
+<span class="kw">import</span> os
+SECRET_KEY = os.environ.get(<span class="st">"SECRET_KEY"</span>, <span class="st">"fallback-for-local-only"</span>)
+
+<span class="cm"># 4. Tell Django where to collect static files (CSS/JS) for production</span>
+STATIC_ROOT = BASE_DIR / <span class="st">"staticfiles"</span>
+
+<span class="cm"># 5. Use PostgreSQL instead of SQLite in production</span>
+<span class="kw">import</span> dj_database_url
+DATABASES = {<span class="st">"default"</span>: dj_database_url.config(default=os.environ.get(<span class="st">"DATABASE_URL"</span>))}
+</code></pre>
+
+  <div class="divider"></div>
+
+  <h2>Option 1: Railway (Recommended — Free Tier Available)</h2>
+  <p>Railway is the simplest way to deploy a Django app. You connect your GitHub repo and it builds and deploys automatically every time you push code.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Install required packages</h4>
+        <p>These are needed for production deployment. Add them to <code>requirements.txt</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <pre><code><span class="cm"># Run in terminal to install</span>
+pip install gunicorn whitenoise psycopg2-binary dj-database-url
+
+<span class="cm"># Then save to requirements.txt</span>
+pip freeze > requirements.txt</code></pre>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Create a Procfile (tells Railway how to run your app)</h4>
+        <p>Create a file called <code>Procfile</code> (no extension) in your project root.</p>
+      </div>
+    </div>
+  </div>
+
+  <pre><code>web: gunicorn travelmatch_project.wsgi --log-file -</code></pre>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Add WhiteNoise to serve static files (CSS/JS)</h4>
+        <p>Edit <code>settings.py</code> to add WhiteNoise middleware — it serves your CSS/JS from the server without needing a separate CDN.</p>
+      </div>
+    </div>
+  </div>
+
+  <pre><code>MIDDLEWARE = [
+    <span class="st">"django.middleware.security.SecurityMiddleware"</span>,
+    <span class="st">"whitenoise.middleware.WhiteNoiseMiddleware"</span>,  <span class="cm"># ← add this second</span>
+    ...
+]
+STATICFILES_STORAGE = <span class="st">"whitenoise.storage.CompressedManifestStaticFilesStorage"</span></code></pre>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Push code to GitHub and connect to Railway</h4>
+        <p>Create a free account at railway.app → New Project → Deploy from GitHub repo → Select your repo. Railway auto-detects it's a Python/Django app.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h4>Add environment variables in Railway dashboard</h4>
+        <p>Go to your project → Variables tab → add these:</p>
+      </div>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Variable</th><th>Value</th></tr>
+    <tr><td><code>SECRET_KEY</code></td><td>A long random string — use <a href="#">djecrety.ir</a> to generate one</td></tr>
+    <tr><td><code>DEBUG</code></td><td><code>False</code></td></tr>
+    <tr><td><code>ALLOWED_HOSTS</code></td><td><code>yourapp.railway.app</code></td></tr>
+    <tr><td><code>DATABASE_URL</code></td><td>Auto-provided by Railway when you add a PostgreSQL plugin</td></tr>
+  </table>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <h4>Add PostgreSQL database plugin</h4>
+        <p>In Railway: New → Database → Add PostgreSQL. Railway connects it automatically and sets <code>DATABASE_URL</code> for you.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">7</div>
+      <div class="step-body">
+        <h4>Run migrations on the live server</h4>
+        <p>In Railway dashboard → your service → Shell tab → run:</p>
+      </div>
+    </div>
+  </div>
+
+  <pre><code>python manage.py migrate
+python manage.py collectstatic --noinput
+python manage.py createsuperuser</code></pre>
+
+  <p>Your app is now live at <strong>yourapp.railway.app</strong> — share this URL with anyone!</p>
+
+  <div class="divider"></div>
+
+  <h2>Option 2: Render (Also Free)</h2>
+  <p>Very similar to Railway. Go to render.com → New Web Service → Connect GitHub → Select repo. Set:</p>
+  <ul>
+    <li><strong>Build Command:</strong> <code>pip install -r requirements.txt && python manage.py collectstatic --noinput</code></li>
+    <li><strong>Start Command:</strong> <code>gunicorn travelmatch_project.wsgi</code></li>
+    <li>Add same environment variables as Railway</li>
+    <li>Create a free PostgreSQL database in Render and connect it</li>
+  </ul>
+
+  <div class="divider"></div>
+
+  <h2>Option 3: Custom Domain (e.g. travelmatch.com)</h2>
+  <p>Once deployed on Railway or Render, you can point a custom domain at it.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Buy a domain name</h4>
+        <p>Go to Namecheap, Google Domains, or GoDaddy. Search for your domain (e.g. <code>travelmatch.app</code>). Costs ~$10-15/year for a <code>.com</code> or <code>.app</code>.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Add the domain in Railway/Render dashboard</h4>
+        <p>Railway: Settings → Domains → Add Custom Domain. It gives you a CNAME record to copy.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Update your domain's DNS settings</h4>
+        <p>In Namecheap/GoDaddy → DNS Management → Add a CNAME record pointing your domain to the Railway/Render URL. DNS changes take 10 minutes to 24 hours to propagate.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>HTTPS is automatic</h4>
+        <p>Railway and Render both automatically provision a free SSL certificate (via Let's Encrypt) so your site runs on <code>https://</code> — no extra setup needed.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h4>Update ALLOWED_HOSTS</h4>
+        <p>Add your custom domain to the environment variable: <code>ALLOWED_HOSTS=travelmatch.app,www.travelmatch.app</code></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <div class="ci">⚠️</div>
+    <div class="cb">
+      <strong>Cost summary</strong>
+      Railway free tier: $5/month credit (enough for a small app). Render free tier: spins down after 15 minutes of inactivity (slow first load). For a real production app with traffic, budget ~$7-15/month for hosting + ~$12/year for a domain = under $200/year total.
+    </div>
+  </div>
+
+  <h2>Deployment Comparison</h2>
+  <table>
+    <tr><th>Platform</th><th>Free Tier</th><th>Ease</th><th>Performance</th><th>Custom Domain</th></tr>
+    <tr><td>Railway</td><td>$5/mo credit</td><td>⭐⭐⭐⭐⭐ Very easy</td><td>Good</td><td>✅ Yes (free SSL)</td></tr>
+    <tr><td>Render</td><td>✅ Free (sleeps)</td><td>⭐⭐⭐⭐ Easy</td><td>OK (slow cold start)</td><td>✅ Yes (free SSL)</td></tr>
+    <tr><td>Heroku</td><td>Paid only now</td><td>⭐⭐⭐⭐ Easy</td><td>Good</td><td>✅ Yes</td></tr>
+    <tr><td>DigitalOcean</td><td>$4/mo minimum</td><td>⭐⭐⭐ Medium</td><td>Excellent</td><td>✅ Yes</td></tr>
+    <tr><td>AWS / GCP</td><td>12-month trial</td><td>⭐⭐ Complex</td><td>Excellent</td><td>✅ Yes</td></tr>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════ CHAPTER 3 ══ -->
+<div class="page chapter">
+  <div class="ch-hero bg-amber">
+    <div class="ch-num">Chapter 3</div>
+    <h1 class="ch-title">Technical Improvements</h1>
+    <p class="ch-desc">Concrete upgrades to make TravelMatch faster, more scalable, and production-ready — from quick wins to major overhauls.</p>
+  </div>
+
+  <h2>Quick Wins (1–3 days each)</h2>
+
+  <div class="card-grid">
+    <div class="card success">
+      <div class="card-icon">🗄</div>
+      <h4>Switch to PostgreSQL</h4>
+      <p>SQLite is a single file — only one person can write to it at a time. PostgreSQL handles thousands of concurrent users. Required for any real deployment. Railway provides it free.</p>
+    </div>
+    <div class="card success">
+      <div class="card-icon">🔐</div>
+      <h4>Email Verification</h4>
+      <p>Add Django's <code>EmailMultiAlternatives</code> to send a verification link after signup. Prevents fake accounts. Use SendGrid (free tier: 100 emails/day).</p>
+    </div>
+    <div class="card success">
+      <div class="card-icon">🖼</div>
+      <h4>Profile Photos</h4>
+      <p>Add an <code>ImageField</code> to Profile model. Store images on Cloudinary or AWS S3 — free for small volumes. Show real photos on match cards.</p>
+    </div>
+    <div class="card success">
+      <div class="card-icon">🔒</div>
+      <h4>Password Reset via Email</h4>
+      <p>Django has this built in — just connect a mail server. Users can recover locked accounts. Needs an SMTP service like SendGrid or Mailgun.</p>
+    </div>
+    <div class="card success">
+      <div class="card-icon">📱</div>
+      <h4>Responsive Polish</h4>
+      <p>Test on mobile screens. Fix the itinerary drag-drop for touch screens (SortableJS supports touch natively). Ensure chat input doesn't get hidden by mobile keyboard.</p>
+    </div>
+    <div class="card success">
+      <div class="card-icon">📊</div>
+      <h4>Pagination</h4>
+      <p>Match feed, group lists, and expense lists should be paginated. Without it, loading 1000 matches at once will be very slow. Django's <code>Paginator</code> class makes this easy.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2>Medium Improvements (1–2 weeks each)</h2>
+
+  <h3>Replace AJAX Polling with WebSockets (Real Real-Time Chat)</h3>
+  <p>Currently chat polls every 2 seconds — meaning messages can arrive up to 2 seconds late, and every user sends a request every 2 seconds even when nothing is happening. <strong>Django Channels</strong> with Redis replaces this with a true persistent connection.</p>
+
+  <pre><code><span class="cm"># Install Django Channels</span>
+pip install channels channels-redis
+
+<span class="cm"># Add to settings.py</span>
+INSTALLED_APPS += [<span class="st">"channels"</span>]
+ASGI_APPLICATION = <span class="st">"travelmatch_project.asgi.application"</span>
+CHANNEL_LAYERS = {
+    <span class="st">"default"</span>: {
+        <span class="st">"BACKEND"</span>: <span class="st">"channels_redis.core.RedisChannelLayer"</span>,
+        <span class="st">"CONFIG"</span>: {<span class="st">"hosts"</span>: [(<span class="st">"127.0.0.1"</span>, <span class="nb">6379</span>)]},
+    }
+}
+<span class="cm"># Result: messages appear instantly, zero polling overhead</span></code></pre>
+
+  <h3>Google Maps / OpenStreetMap Integration</h3>
+  <p>Currently <code>location_lat</code> and <code>location_lng</code> fields exist in <code>ItineraryActivity</code> but aren't used. Adding a map makes the itinerary far more useful:</p>
+  <ul>
+    <li>Auto-complete location search using Google Places API (or OpenStreetMap's Nominatim — free)</li>
+    <li>Show activity pins on a map within the itinerary tab</li>
+    <li>Calculate distances and travel times between activities</li>
+  </ul>
+
+  <h3>Search & Filter on Match Feed</h3>
+  <p>Currently the feed shows all ranked matches. Add filters:</p>
+  <table>
+    <tr><th>Filter</th><th>Implementation</th></tr>
+    <tr><td>Minimum score threshold</td><td>Pass <code>threshold=0.6</code> to <code>get_ranked_matches()</code></td></tr>
+    <tr><td>Filter by destination</td><td>Add a <code>destinations__contains</code> queryset filter</td></tr>
+    <tr><td>Filter by travel month</td><td>Check if months overlap before scoring</td></tr>
+    <tr><td>Search by username</td><td>Simple <code>username__icontains</code> filter</td></tr>
+  </table>
+
+  <h3>Notifications System</h3>
+  <p>Add a <code>Notification</code> model and alert users when: someone likes them back, they're invited to a group, a new chat message arrives (if they're not in the chat), a new expense is added to their group.</p>
+
+  <h3>Mutual Match Detection</h3>
+  <p>Currently "like" just saves a record. Add logic: when user A likes user B <em>and</em> user B has already liked user A → it's a mutual match. Show a "You matched!" notification and suggest creating a trip group together.</p>
+
+  <div class="divider"></div>
+
+  <h2>Major Upgrades (1–4 weeks each)</h2>
+
+  <div class="card-grid">
+    <div class="card warning">
+      <div class="card-icon">🤖</div>
+      <h4>AI-Enhanced Matching</h4>
+      <p>Use OpenAI's API to analyze user bios and find deeper personality compatibility beyond just structured preferences. "Both enjoy slow travel and local food" vs "both like adventure sports".</p>
+    </div>
+    <div class="card warning">
+      <div class="card-icon">📱</div>
+      <h4>React Native Mobile App</h4>
+      <p>A mobile app dramatically increases engagement. The Django backend already works as an API — add Django REST Framework and build iOS + Android with React Native or Flutter.</p>
+    </div>
+    <div class="card warning">
+      <div class="card-icon">🌐</div>
+      <h4>Social Login</h4>
+      <p>Let users sign in with Google or Facebook using <code>django-allauth</code>. Removes signup friction — more users complete registration when they don't need a new password.</p>
+    </div>
+    <div class="card warning">
+      <div class="card-icon">✈️</div>
+      <h4>Flight & Hotel Search</h4>
+      <p>Integrate Skyscanner or Amadeus API to search flights directly from a group's itinerary. Show real prices and let members vote on flight options.</p>
+    </div>
+    <div class="card warning">
+      <div class="card-icon">🌍</div>
+      <h4>Multi-Currency Expenses</h4>
+      <p>Fetch live exchange rates (via Open Exchange Rates API — free tier). Convert all expenses to one base currency for accurate settlement calculations across mixed currencies.</p>
+    </div>
+    <div class="card warning">
+      <div class="card-icon">📸</div>
+      <h4>Trip Photo Gallery</h4>
+      <p>Add a shared photo album per group. Members upload trip photos which are stored on Cloudinary. Creates lasting memories and social proof for the platform.</p>
+    </div>
+  </div>
+
+  <h2>Performance & Scalability</h2>
+  <table>
+    <tr><th>Issue</th><th>Solution</th><th>Impact</th></tr>
+    <tr><td>Matching scans all users on every page load</td><td>Cache results in Redis with 10-min TTL, invalidate on profile update</td><td>10–100x faster for large user bases</td></tr>
+    <tr><td>SQLite single-writer bottleneck</td><td>Switch to PostgreSQL</td><td>Handles thousands of concurrent writes</td></tr>
+    <tr><td>Chat polling = constant server load</td><td>Django Channels WebSockets</td><td>90% reduction in server requests</td></tr>
+    <tr><td>No image optimization</td><td>Cloudinary auto-resize + WebP conversion</td><td>Faster page loads on mobile</td></tr>
+    <tr><td>No caching layer</td><td>Add Redis + django-cacheops</td><td>Expensive DB queries cached</td></tr>
+    <tr><td>Synchronous views block under load</td><td>Migrate to async views (Django 4.2 supports this)</td><td>Handles more concurrent users</td></tr>
+  </table>
+
+  <h2>Security Hardening</h2>
+  <div class="card-grid">
+    <div class="card danger">
+      <div class="card-icon">🛡</div>
+      <h4>Rate Limiting</h4>
+      <p>Add <code>django-ratelimit</code> to the login and signup views. Prevents brute-force password attacks and account enumeration.</p>
+    </div>
+    <div class="card danger">
+      <div class="card-icon">🔏</div>
+      <h4>Content Security Policy</h4>
+      <p>Add <code>django-csp</code> to set CSP headers. Prevents XSS attacks by whitelisting which scripts and styles can load on your pages.</p>
+    </div>
+    <div class="card danger">
+      <div class="card-icon">🚫</div>
+      <h4>Input Sanitization</h4>
+      <p>All user text content (bios, messages, activity names) should be escaped in templates — Django does this by default with <code>{{ }}</code> — but double-check no <code>{{ |safe }}</code> is used.</p>
+    </div>
+    <div class="card danger">
+      <div class="card-icon">📋</div>
+      <h4>Audit Logging</h4>
+      <p>Log who created/deleted groups and expenses. Useful for disputes ("I didn't delete that expense"). Use <code>django-auditlog</code> — one line per model.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ CHAPTER 4 ══ -->
+<div class="page chapter">
+  <div class="ch-hero bg-violet">
+    <div class="ch-num">Chapter 4</div>
+    <h1 class="ch-title">Future Features & Product Vision</h1>
+    <p class="ch-desc">What TravelMatch could become — from a student project to a full travel social platform.</p>
+  </div>
+
+  <div class="big-quote">
+    The global online travel market is worth $800 billion. TravelMatch targets the fastest-growing segment: solo and group independent travelers who plan their own trips.
+  </div>
+
+  <h2>Feature Roadmap by Priority</h2>
+
+  <ul class="feature-list">
+    <li>
+      <div class="fi done">✅</div>
+      <div><strong>User matching with compatibility algorithm</strong> — <span class="pill pill-green">Done</span><br><span style="color:#64748b;font-size:12px;">Weighted scoring across 5 travel preferences</span></div>
+    </li>
+    <li>
+      <div class="fi done">✅</div>
+      <div><strong>Group trip management with invite codes</strong> — <span class="pill pill-green">Done</span></div>
+    </li>
+    <li>
+      <div class="fi done">✅</div>
+      <div><strong>Real-time group chat (AJAX polling)</strong> — <span class="pill pill-green">Done</span></div>
+    </li>
+    <li>
+      <div class="fi done">✅</div>
+      <div><strong>Collaborative drag-to-reorder itinerary</strong> — <span class="pill pill-green">Done</span></div>
+    </li>
+    <li>
+      <div class="fi done">✅</div>
+      <div><strong>Expense tracking with smart settlement</strong> — <span class="pill pill-green">Done</span></div>
+    </li>
+    <li>
+      <div class="fi next">🔜</div>
+      <div><strong>Email verification & password reset</strong> — <span class="pill pill-indigo">Up Next</span><br><span style="color:#64748b;font-size:12px;">Required for real-world use</span></div>
+    </li>
+    <li>
+      <div class="fi next">🔜</div>
+      <div><strong>Profile photos with Cloudinary</strong> — <span class="pill pill-indigo">Up Next</span></div>
+    </li>
+    <li>
+      <div class="fi next">🔜</div>
+      <div><strong>Mutual match notifications</strong> — <span class="pill pill-indigo">Up Next</span><br><span style="color:#64748b;font-size:12px;">Alert when two users both like each other</span></div>
+    </li>
+    <li>
+      <div class="fi soon">💡</div>
+      <div><strong>WebSocket chat (Django Channels)</strong> — <span class="pill pill-blue">Soon</span><br><span style="color:#64748b;font-size:12px;">Replace polling with true real-time</span></div>
+    </li>
+    <li>
+      <div class="fi soon">💡</div>
+      <div><strong>Google Maps itinerary integration</strong> — <span class="pill pill-blue">Soon</span></div>
+    </li>
+    <li>
+      <div class="fi soon">💡</div>
+      <div><strong>Social login (Google / Facebook)</strong> — <span class="pill pill-blue">Soon</span></div>
+    </li>
+    <li>
+      <div class="fi soon">💡</div>
+      <div><strong>Multi-currency expense conversion</strong> — <span class="pill pill-blue">Soon</span></div>
+    </li>
+    <li>
+      <div class="fi later">🌟</div>
+      <div><strong>AI bio matching (OpenAI API)</strong> — <span class="pill pill-amber">Future</span><br><span style="color:#64748b;font-size:12px;">Analyze personality beyond structured preferences</span></div>
+    </li>
+    <li>
+      <div class="fi later">🌟</div>
+      <div><strong>React Native mobile app (iOS + Android)</strong> — <span class="pill pill-amber">Future</span></div>
+    </li>
+    <li>
+      <div class="fi later">🌟</div>
+      <div><strong>Flight & hotel search integration</strong> — <span class="pill pill-amber">Future</span></div>
+    </li>
+    <li>
+      <div class="fi later">🌟</div>
+      <div><strong>Trip photo album & shared memories</strong> — <span class="pill pill-amber">Future</span></div>
+    </li>
+    <li>
+      <div class="fi later">🌟</div>
+      <div><strong>Traveler reputation & review system</strong> — <span class="pill pill-amber">Future</span></div>
+    </li>
+    <li>
+      <div class="fi later">🌟</div>
+      <div><strong>Visa & entry requirements lookup</strong> — <span class="pill pill-amber">Future</span></div>
+    </li>
+    <li>
+      <div class="fi later">🌟</div>
+      <div><strong>In-app messaging between matched users (before group)</strong> — <span class="pill pill-amber">Future</span></div>
+    </li>
+    <li>
+      <div class="fi later">🌟</div>
+      <div><strong>AI-powered packing list generator</strong> — <span class="pill pill-amber">Future</span></div>
+    </li>
+  </ul>
+</div>
+
+<!-- ═══════════════════════════════ CHAPTER 5 ══ -->
+<div class="page chapter">
+  <div class="ch-hero bg-slate">
+    <div class="ch-num">Chapter 5</div>
+    <h1 class="ch-title">Development Roadmap — 4 Phases</h1>
+    <p class="ch-desc">A realistic, phased plan from where the project is today to a fully monetized travel platform.</p>
+  </div>
+
+  <div class="timeline">
+
+    <div class="tl-item">
+      <div class="tl-dot" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">1</div>
+      <div class="tl-body">
+        <div class="tl-when">Phase 1 · Now → Month 2</div>
+        <h4>Polish & Deploy MVP</h4>
+        <p>Make the current platform production-ready and get it online so real users can try it. Focus is reliability and trust — users won't use an app that feels unfinished.</p>
+        <div class="tl-tags">
+          <span class="tl-tag">Deploy to Railway</span>
+          <span class="tl-tag">PostgreSQL</span>
+          <span class="tl-tag">Email verification</span>
+          <span class="tl-tag">Password reset</span>
+          <span class="tl-tag">Profile photos</span>
+          <span class="tl-tag">Mobile responsive</span>
+          <span class="tl-tag">Custom domain</span>
+          <span class="tl-tag">Bug fixes</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot" style="background: linear-gradient(135deg, #059669, #0891b2);">2</div>
+      <div class="tl-body">
+        <div class="tl-when">Phase 2 · Month 3–5</div>
+        <h4>Improve Social Features & Real-Time</h4>
+        <p>Make the core matchmaking and group experience feel alive. This phase turns a functional tool into something people actually enjoy using daily and want to recommend.</p>
+        <div class="tl-tags">
+          <span class="tl-tag">Mutual matches</span>
+          <span class="tl-tag">WebSocket chat</span>
+          <span class="tl-tag">Notifications</span>
+          <span class="tl-tag">Google Maps itinerary</span>
+          <span class="tl-tag">Social login</span>
+          <span class="tl-tag">Match filters</span>
+          <span class="tl-tag">User reviews</span>
+          <span class="tl-tag">Multi-currency</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot" style="background: linear-gradient(135deg, #d97706, #dc2626);">3</div>
+      <div class="tl-body">
+        <div class="tl-when">Phase 3 · Month 6–10</div>
+        <h4>Mobile App & Platform Expansion</h4>
+        <p>Build a mobile app (most travel planning happens on phones), add AI features, and integrate real travel data. This is where TravelMatch transitions from "useful tool" to "travel companion app".</p>
+        <div class="tl-tags">
+          <span class="tl-tag">React Native app (iOS + Android)</span>
+          <span class="tl-tag">Push notifications</span>
+          <span class="tl-tag">AI bio matching</span>
+          <span class="tl-tag">Flight search API</span>
+          <span class="tl-tag">Hotel search API</span>
+          <span class="tl-tag">Packing list AI</span>
+          <span class="tl-tag">Photo albums</span>
+          <span class="tl-tag">Offline mode</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot" style="background: linear-gradient(135deg, #7c3aed, #db2777);">4</div>
+      <div class="tl-body">
+        <div class="tl-when">Phase 4 · Month 11+</div>
+        <h4>Monetization & Scale</h4>
+        <p>Build revenue streams that make sense for the community — no annoying ads, no paywalling core features. Focus on partnerships and premium features that power users will pay for.</p>
+        <div class="tl-tags">
+          <span class="tl-tag">Premium subscriptions</span>
+          <span class="tl-tag">Affiliate hotel/flight commissions</span>
+          <span class="tl-tag">Travel insurance partnership</span>
+          <span class="tl-tag">Verified traveler badge</span>
+          <span class="tl-tag">Community forums</span>
+          <span class="tl-tag">Travel agency partnerships</span>
+          <span class="tl-tag">B2B group travel tools</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <h2>Monetization Strategy</h2>
+  <p>The best travel apps succeed by adding real value — not by charging for things users expect for free. Here's a tiered approach:</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">🆓</div>
+      <h4>Free Tier (Always)</h4>
+      <p>Core matching, 1 active group, group chat, basic itinerary, expense splitting. Enough to get full value from the platform.</p>
+    </div>
+    <div class="card highlight">
+      <div class="card-icon">⭐</div>
+      <h4>Premium ($5–9/month)</h4>
+      <p>Unlimited groups, see who liked you, advanced filters, profile boost in search, detailed compatibility breakdown, ad-free.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">✈️</div>
+      <h4>Affiliate Revenue</h4>
+      <p>When users book flights/hotels through TravelMatch's search, earn 2–5% commission. Zero friction — users get a good price, platform earns passively.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🤝</div>
+      <h4>B2B: Group Travel</h4>
+      <p>Sell group management tools to travel agencies and tour operators. White-label the expense splitting and itinerary planning features.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2>Competitive Landscape</h2>
+  <table class="comp-head">
+    <tr>
+      <th>Feature</th>
+      <th>TravelMatch</th>
+      <th>Hostelworld</th>
+      <th>Tripit</th>
+      <th>Splitwise</th>
+      <th>Couchsurfing</th>
+    </tr>
+    <tr>
+      <td>Travel buddy matching</td>
+      <td><span class="comp-check">✓</span> Algorithmic</td>
+      <td><span class="comp-partial">~ </span>Forums</td>
+      <td><span class="comp-cross">✗</span></td>
+      <td><span class="comp-cross">✗</span></td>
+      <td><span class="comp-partial">~</span> Manual</td>
+    </tr>
+    <tr>
+      <td>Group trip planning</td>
+      <td><span class="comp-check">✓</span></td>
+      <td><span class="comp-cross">✗</span></td>
+      <td><span class="comp-check">✓</span></td>
+      <td><span class="comp-cross">✗</span></td>
+      <td><span class="comp-cross">✗</span></td>
+    </tr>
+    <tr>
+      <td>Expense splitting</td>
+      <td><span class="comp-check">✓</span></td>
+      <td><span class="comp-cross">✗</span></td>
+      <td><span class="comp-cross">✗</span></td>
+      <td><span class="comp-check">✓</span> Best-in-class</td>
+      <td><span class="comp-cross">✗</span></td>
+    </tr>
+    <tr>
+      <td>Group chat</td>
+      <td><span class="comp-check">✓</span></td>
+      <td><span class="comp-cross">✗</span></td>
+      <td><span class="comp-cross">✗</span></td>
+      <td><span class="comp-cross">✗</span></td>
+      <td><span class="comp-partial">~</span> Limited</td>
+    </tr>
+    <tr>
+      <td>Itinerary builder</td>
+      <td><span class="comp-check">✓</span></td>
+      <td><span class="comp-cross">✗</span></td>
+      <td><span class="comp-check">✓</span> Strong</td>
+      <td><span class="comp-cross">✗</span></td>
+      <td><span class="comp-cross">✗</span></td>
+    </tr>
+    <tr>
+      <td>All-in-one</td>
+      <td><span class="comp-check">✓</span> <strong>Only one</strong></td>
+      <td><span class="comp-cross">✗</span></td>
+      <td><span class="comp-cross">✗</span></td>
+      <td><span class="comp-cross">✗</span></td>
+      <td><span class="comp-cross">✗</span></td>
+    </tr>
+  </table>
+
+  <div class="callout key">
+    <div class="ci">🎯</div>
+    <div class="cb">
+      <strong>The unique opportunity</strong>
+      No existing product combines travel companion matching + group coordination + expense splitting in one place. Users currently need 3–4 apps (Tinder/Facebook for finding people, WhatsApp for chat, Google Docs for planning, Splitwise for money). TravelMatch can own this entire workflow.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ CHAPTER 6 ══ -->
+<div class="page chapter">
+  <div class="ch-hero bg-emerald">
+    <div class="ch-num">Chapter 6</div>
+    <h1 class="ch-title">Next Steps Checklist</h1>
+    <p class="ch-desc">A practical, prioritized action list — what to do this week, this month, and this quarter.</div>
+  </div>
+
+  <h2>This Week — Make It Deployable</h2>
+  <div class="card-grid three">
+    <div class="card success">
+      <h4>□ Install production deps</h4>
+      <p><code>pip install gunicorn whitenoise psycopg2-binary dj-database-url</code><br>Update requirements.txt</p>
+    </div>
+    <div class="card success">
+      <h4>□ Create Procfile</h4>
+      <p>Add <code>Procfile</code> to root: <code>web: gunicorn travelmatch_project.wsgi</code></p>
+    </div>
+    <div class="card success">
+      <h4>□ Update settings.py</h4>
+      <p>DEBUG=False, read SECRET_KEY from env, add STATIC_ROOT, add WhiteNoise middleware</p>
+    </div>
+    <div class="card success">
+      <h4>□ Push to GitHub</h4>
+      <p><code>git init</code> → <code>git add .</code> → <code>git commit</code> → create GitHub repo → <code>git push</code></p>
+    </div>
+    <div class="card success">
+      <h4>□ Deploy to Railway</h4>
+      <p>railway.app → New Project → Deploy from GitHub → add environment variables → add PostgreSQL plugin</p>
+    </div>
+    <div class="card success">
+      <h4>□ Run migrations live</h4>
+      <p>Railway Shell: <code>python manage.py migrate</code> then <code>python manage.py createsuperuser</code></p>
+    </div>
+  </div>
+
+  <h2>This Month — Core Quality</h2>
+  <ul class="feature-list">
+    <li><div class="fi next">🔜</div><div><strong>Add email verification on signup</strong> — prevents fake accounts, required for professional appearance</div></li>
+    <li><div class="fi next">🔜</div><div><strong>Add profile photo upload</strong> — matching without photos has much lower engagement</div></li>
+    <li><div class="fi next">🔜</div><div><strong>Add mutual match detection</strong> — "You and Alice both liked each other!" is a key engagement moment</div></li>
+    <li><div class="fi next">🔜</div><div><strong>Add pagination</strong> — match feed, group list, expense list should load 20 items at a time</div></li>
+    <li><div class="fi next">🔜</div><div><strong>Test on mobile</strong> — fix anything that's broken on phone screens, especially drag-drop and chat</div></li>
+    <li><div class="fi next">🔜</div><div><strong>Add a .gitignore</strong> — make sure <code>db.sqlite3</code>, <code>.env</code>, <code>__pycache__</code>, <code>.venv</code> are excluded from git</div></li>
+  </ul>
+
+  <h2>This Quarter — Core Growth Features</h2>
+  <ul class="feature-list">
+    <li><div class="fi soon">💡</div><div><strong>Switch chat to WebSockets</strong> — install Django Channels + Redis for true real-time messaging</div></li>
+    <li><div class="fi soon">💡</div><div><strong>Add Google Maps to itinerary</strong> — drag activities onto a map, see the day's route</div></li>
+    <li><div class="fi soon">💡</div><div><strong>Social login</strong> — install django-allauth, add "Continue with Google" button</div></li>
+    <li><div class="fi soon">💡</div><div><strong>Notifications bell</strong> — in-app alerts for new likes, group invites, new expenses</div></li>
+    <li><div class="fi soon">💡</div><div><strong>Direct messaging</strong> — let matched users message each other before creating a group</div></li>
+    <li><div class="fi soon">💡</div><div><strong>Buy a domain and set up custom email</strong> — travelmatch.app or travelmatch.co with hello@travelmatch.app</div></li>
+  </ul>
+
+  <div class="divider"></div>
+
+  <h2>Essential .gitignore (Create This Now)</h2>
+  <pre><code><span class="cm"># File: .gitignore (in project root)</span>
+
+<span class="cm"># Database — never commit, contains all user data</span>
+db.sqlite3
+
+<span class="cm"># Virtual environment — too large, not needed in repo</span>
+.venv/
+.venv-1/
+venv/
+
+<span class="cm"># Environment variables — contains secrets</span>
+.env
+.env.local
+*.env
+
+<span class="cm"># Python cache files</span>
+__pycache__/
+*.pyc
+*.pyo
+
+<span class="cm"># Django collected static (generated, not source)</span>
+staticfiles/
+
+<span class="cm"># OS files</span>
+.DS_Store
+Thumbs.db
+
+<span class="cm"># IDE files</span>
+.vscode/
+.idea/</code></pre>
+
+  <div class="callout warn">
+    <div class="ci">⚠️</div>
+    <div class="cb">
+      <strong>Never commit your SECRET_KEY or database to GitHub</strong>
+      If your GitHub repository is public, anyone who can see it can steal your SECRET_KEY and forge session cookies, gaining access to any account on your site. The <code>.gitignore</code> above prevents this. Always store secrets in environment variables.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2>Summary</h2>
+
+  <table>
+    <tr><th>Right Now</th><th>After Deployment</th><th>In 6 Months</th></tr>
+    <tr>
+      <td>
+        ✅ Smart matching algorithm<br>
+        ✅ Trip group management<br>
+        ✅ Group chat (polling)<br>
+        ✅ Drag-and-drop itinerary<br>
+        ✅ Expense splitting + settlement<br>
+        ✅ Runs locally on your Mac
+      </td>
+      <td>
+        🌐 Live on the internet<br>
+        🔐 Email verification<br>
+        🖼 Profile photos<br>
+        🤝 Mutual matches<br>
+        📱 Mobile-optimised<br>
+        🗄 PostgreSQL database
+      </td>
+      <td>
+        💬 True real-time chat<br>
+        🗺 Maps in itinerary<br>
+        📲 Mobile app (iOS/Android)<br>
+        🔔 Notifications<br>
+        💬 Direct messaging<br>
+        🤖 AI-enhanced matching
+      </td>
+    </tr>
+  </table>
+
+  <div class="callout tip">
+    <div class="ci">🚀</div>
+    <div class="cb">
+      <strong>You've built the hardest part</strong>
+      The compatibility algorithm, the settlement engine, the real-time chat architecture, and the full database schema are already done. These are the genuinely difficult engineering problems. Everything in this roadmap — deployment, new features, mobile app — builds on this foundation. The core is solid.
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

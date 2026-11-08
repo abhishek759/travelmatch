@@ -1,0 +1,636 @@
+{% extends "base.html" %}
+{% block title %}{{ group.name }} · TravelMatch{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+  <div>
+    <div class="d-flex align-items-center gap-2 mb-1">
+      <a href="{% url 'group_list' %}" class="btn btn-sm btn-outline-secondary py-0 px-2">
+        <i class="bi bi-arrow-left"></i>
+      </a>
+      <h2 class="fw-bold mb-0">{{ group.name }}</h2>
+    </div>
+    <div class="text-muted small d-flex align-items-center gap-3 flex-wrap">
+      <span><i class="bi bi-geo-alt me-1"></i>{{ group.destination }}</span>
+      {% if group.start_date %}<span><i class="bi bi-calendar3 me-1"></i>{{ group.start_date|date:"M d" }} – {{ group.end_date|date:"M d, Y" }}</span>{% endif %}
+      <span><i class="bi bi-people me-1"></i>{{ group.member_count }}/{{ group.max_members }} members</span>
+    </div>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    {% if is_member %}
+    {% if is_owner %}
+    <span class="badge bg-primary align-self-center">Owner</span>
+    <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#inviteModal">
+      <i class="bi bi-person-plus me-1"></i>Invite
+    </button>
+    {% endif %}
+    <form method="post" action="{% url 'group_leave' group.pk %}">
+      {% csrf_token %}
+      <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Leave this group?')">Leave</button>
+    </form>
+    {% else %}
+    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#joinModal">
+      <i class="bi bi-plus me-1"></i>Join Group
+    </button>
+    {% endif %}
+  </div>
+</div>
+
+{% if group.description %}
+<p class="text-muted mb-4">{{ group.description }}</p>
+{% endif %}
+
+<!-- Invite code -->
+{% if is_owner %}
+<div class="alert alert-light border mb-4 d-flex align-items-center gap-3 py-2">
+  <i class="bi bi-key text-primary"></i>
+  <span class="small">Invite code: <strong class="font-monospace">{{ group.invite_code }}</strong></span>
+  <button class="btn btn-sm btn-outline-secondary ms-auto" onclick="navigator.clipboard.writeText('{{ group.invite_code }}')">
+    <i class="bi bi-clipboard"></i> Copy
+  </button>
+</div>
+{% endif %}
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-4" id="groupTabs">
+  <li class="nav-item">
+    <a class="nav-link active" data-bs-toggle="tab" href="#chat-tab"><i class="bi bi-chat-dots me-1"></i>Chat</a>
+  </li>
+  {% if is_member %}
+  <li class="nav-item">
+    <a class="nav-link" data-bs-toggle="tab" href="#itinerary-tab"><i class="bi bi-calendar2-week me-1"></i>Itinerary</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-bs-toggle="tab" href="#expenses-tab"><i class="bi bi-cash me-1"></i>Expenses</a>
+  </li>
+  {% endif %}
+  <li class="nav-item">
+    <a class="nav-link" data-bs-toggle="tab" href="#members-tab"><i class="bi bi-people me-1"></i>Members</a>
+  </li>
+</ul>
+
+<div class="tab-content">
+
+  <!-- ═══════ CHAT TAB ═══════ -->
+  <div class="tab-pane fade show active" id="chat-tab">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body p-0">
+        <div id="chat-messages" style="height:400px;overflow-y:auto;padding:1.25rem 1.5rem;">
+          {% for msg in group.messages.all %}
+          <div class="d-flex gap-2 mb-3 {% if msg.sender == user %}flex-row-reverse{% endif %}">
+            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold"
+                 style="width:32px;height:32px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:.8rem;">
+              {{ msg.sender.username|first|upper }}
+            </div>
+            <div style="max-width:75%;">
+              <div class="small text-muted mb-1 {% if msg.sender == user %}text-end{% endif %}">
+                {{ msg.sender.username }} · {{ msg.sent_at|date:"H:i" }}
+              </div>
+              <div class="rounded-3 px-3 py-2 {% if msg.sender == user %}bg-primary text-white{% else %}bg-light{% endif %}">
+                {{ msg.body }}
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <p class="text-center text-muted mt-5">No messages yet. Say hello!</p>
+          {% endfor %}
+        </div>
+
+        {% if is_member %}
+        <div class="border-top p-3 d-flex gap-2">
+          <input type="text" id="chat-input" class="form-control" placeholder="Type a message…" maxlength="2000">
+          <button id="chat-send" class="btn btn-primary px-3">
+            <i class="bi bi-send"></i>
+          </button>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {% if is_member %}
+  <!-- ═══════ ITINERARY TAB ═══════ -->
+  <div class="tab-pane fade" id="itinerary-tab">
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <!-- Days -->
+        <div id="itinerary-days">
+          {% for day in itinerary_days %}
+          <div class="card border-0 shadow-sm rounded-4 mb-3" id="day-{{ day.pk }}">
+            <div class="card-header bg-transparent border-0 px-4 pt-3 pb-0 d-flex align-items-center gap-2">
+              <span class="badge bg-primary">Day {{ day.day_number }}</span>
+              <span class="fw-semibold">{{ day.title }}{% if day.date %} — {{ day.date|date:"M d, Y" }}{% endif %}</span>
+            </div>
+            <div class="card-body px-4 pb-4">
+              <ul class="list-group list-group-flush sortable-list" data-day-id="{{ day.pk }}">
+                {% for act in day.activities.all %}
+                <li class="list-group-item px-2 py-2 d-flex align-items-start gap-2 border-0" data-activity-id="{{ act.pk }}">
+                  <i class="bi bi-grip-vertical text-muted mt-1" style="cursor:grab;"></i>
+                  <div class="flex-grow-1">
+                    <div class="fw-semibold small">{{ act.name }}</div>
+                    {% if act.start_time %}
+                    <div class="text-muted" style="font-size:.75rem;">
+                      <i class="bi bi-clock me-1"></i>{{ act.start_time|time:"H:i" }}{% if act.end_time %} – {{ act.end_time|time:"H:i" }}{% endif %}
+                    </div>
+                    {% endif %}
+                    {% if act.location_name %}
+                    <div class="text-muted" style="font-size:.75rem;"><i class="bi bi-geo me-1"></i>{{ act.location_name }}</div>
+                    {% endif %}
+                    {% if act.assignee %}
+                    <div class="text-muted" style="font-size:.75rem;"><i class="bi bi-person me-1"></i>{{ act.assignee.username }}</div>
+                    {% endif %}
+                  </div>
+                  <button class="btn btn-sm text-danger p-0 delete-activity-btn" data-activity-id="{{ act.pk }}" title="Delete">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </li>
+                {% empty %}
+                <li class="list-group-item text-muted small border-0 px-2">No activities yet.</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+          {% empty %}
+          <div class="text-center py-4 text-muted">
+            <i class="bi bi-calendar2-week" style="font-size:3rem;opacity:.2;"></i>
+            <p class="mt-2">No days added yet. Add your first day!</p>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Add day -->
+        <div class="card border-0 shadow-sm rounded-4 border-dashed">
+          <div class="card-body p-3">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <input type="text" id="new-day-title" class="form-control form-control-sm" placeholder="Day title (e.g. Arrival)" style="max-width:220px;">
+              <input type="date" id="new-day-date" class="form-control form-control-sm" style="max-width:170px;">
+              <button id="add-day-btn" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-lg me-1"></i>Add Day
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add activity -->
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4">
+          <div class="card-header bg-transparent border-0 px-4 pt-3 pb-0">
+            <h6 class="fw-semibold mb-0"><i class="bi bi-plus-circle me-2 text-primary"></i>Add Activity</h6>
+          </div>
+          <div class="card-body p-4">
+            <div class="mb-2">
+              <select id="act-day-select" class="form-select form-select-sm">
+                <option value="">— Select day —</option>
+                {% for day in itinerary_days %}
+                <option value="{{ day.pk }}">Day {{ day.day_number }}: {{ day.title }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-2">
+              <input type="text" id="act-name" class="form-control form-control-sm" placeholder="Activity name *">
+            </div>
+            <div class="row g-2 mb-2">
+              <div class="col-6">
+                <input type="time" id="act-start" class="form-control form-control-sm">
+              </div>
+              <div class="col-6">
+                <input type="time" id="act-end" class="form-control form-control-sm">
+              </div>
+            </div>
+            <div class="mb-2">
+              <input type="text" id="act-location" class="form-control form-control-sm" placeholder="Location">
+            </div>
+            <div class="mb-3">
+              <textarea id="act-notes" class="form-control form-control-sm" rows="2" placeholder="Notes"></textarea>
+            </div>
+            <button id="add-activity-btn" class="btn btn-primary btn-sm w-100">
+              <i class="bi bi-plus-lg me-1"></i>Add Activity
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ EXPENSES TAB ═══════ -->
+  <div class="tab-pane fade" id="expenses-tab">
+    <div class="row g-4">
+      <!-- Expense list -->
+      <div class="col-lg-7">
+        <div class="card border-0 shadow-sm rounded-4">
+          <div class="card-header bg-transparent border-0 px-4 pt-3 pb-0 d-flex justify-content-between align-items-center">
+            <h6 class="fw-semibold mb-0">All Expenses</h6>
+            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addExpenseModal">
+              <i class="bi bi-plus-lg me-1"></i>Add Expense
+            </button>
+          </div>
+          <div class="card-body px-4 pb-4">
+            {% if expenses %}
+            <div id="expense-list">
+              {% for exp in expenses %}
+              <div class="d-flex align-items-start gap-3 py-3 border-bottom expense-item" data-expense-id="{{ exp.pk }}">
+                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                     style="width:36px;height:36px;background:#f1f0ff;">
+                  <i class="bi bi-receipt text-primary"></i>
+                </div>
+                <div class="flex-grow-1">
+                  <div class="fw-semibold small">{{ exp.description }}</div>
+                  <div class="text-muted" style="font-size:.75rem;">
+                    Paid by {{ exp.paid_by.username }} · {{ exp.expense_date }}
+                    {% if exp.category %} · {{ exp.category }}{% endif %}
+                  </div>
+                </div>
+                <div class="text-end">
+                  <div class="fw-bold text-success">{{ exp.currency }} {{ exp.amount }}</div>
+                  <div class="text-muted" style="font-size:.7rem;">{{ exp.get_split_type_display }}</div>
+                </div>
+                {% if is_owner or exp.paid_by == user %}
+                <button class="btn btn-sm text-danger p-0 delete-expense-btn" data-expense-id="{{ exp.pk }}" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+                {% endif %}
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted text-center py-3">No expenses yet.</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Balances -->
+        <div class="card border-0 shadow-sm rounded-4 mt-3">
+          <div class="card-header bg-transparent border-0 px-4 pt-3 pb-0">
+            <h6 class="fw-semibold mb-0"><i class="bi bi-bar-chart me-2 text-primary"></i>Balances</h6>
+          </div>
+          <div class="card-body px-4 pb-4">
+            {% if balances %}
+            {% for member_user, balance in balances.items %}
+            <div class="d-flex align-items-center gap-2 py-2 border-bottom">
+              <span class="small fw-semibold flex-grow-1">{{ member_user.username }}</span>
+              <span class="fw-bold small {% if balance > 0 %}text-success{% elif balance < 0 %}text-danger{% else %}text-muted{% endif %}">
+                {% if balance > 0 %}+{% endif %}{{ balance|floatformat:2 }}
+              </span>
+              {% if balance > 0 %}
+              <span class="badge bg-success bg-opacity-10 text-success" style="font-size:.7rem;">owed to them</span>
+              {% elif balance < 0 %}
+              <span class="badge bg-danger bg-opacity-10 text-danger" style="font-size:.7rem;">owes</span>
+              {% else %}
+              <span class="badge bg-secondary bg-opacity-10 text-secondary" style="font-size:.7rem;">settled</span>
+              {% endif %}
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="text-muted small">No balance data yet.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Settlement -->
+      <div class="col-lg-5">
+        <div class="card border-0 shadow-sm rounded-4">
+          <div class="card-header bg-transparent border-0 px-4 pt-3 pb-0">
+            <h6 class="fw-semibold mb-0"><i class="bi bi-arrow-left-right me-2 text-primary"></i>Settlement Plan</h6>
+          </div>
+          <div class="card-body px-4 pb-4">
+            <p class="text-muted small mb-3">Minimum transfers to settle all debts.</p>
+            {% if settlement %}
+            {% for t in settlement %}
+            <div class="d-flex align-items-center gap-2 py-2 border-bottom">
+              <span class="badge bg-danger bg-opacity-10 text-danger small">{{ t.from_user.username }}</span>
+              <i class="bi bi-arrow-right text-muted small"></i>
+              <span class="badge bg-success bg-opacity-10 text-success small">{{ t.to_user.username }}</span>
+              <span class="ms-auto fw-bold small">{{ t.amount|floatformat:2 }}</span>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="text-center py-3">
+              <i class="bi bi-check-circle text-success fs-3"></i>
+              <p class="text-muted small mt-2">All settled up!</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ═══════ MEMBERS TAB ═══════ -->
+  <div class="tab-pane fade" id="members-tab">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body p-4">
+        <div class="list-group list-group-flush">
+          {% for membership in members %}
+          <div class="list-group-item px-0 py-3 border-0 d-flex align-items-center gap-3">
+            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold"
+                 style="width:40px;height:40px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;">
+              {{ membership.user.username|first|upper }}
+            </div>
+            <div class="flex-grow-1">
+              <div class="fw-semibold">{{ membership.user.username }}</div>
+              <div class="text-muted small">Joined {{ membership.joined_at|date:"M d, Y" }}</div>
+            </div>
+            <span class="badge {% if membership.role == 'owner' %}bg-primary{% else %}bg-secondary{% endif %} bg-opacity-10 {% if membership.role == 'owner' %}text-primary{% else %}text-secondary{% endif %}">
+              {{ membership.get_role_display }}
+            </span>
+            {% if is_owner and membership.user != user %}
+            <form method="post" action="{% url 'group_remove_member' group.pk membership.user.pk %}" onsubmit="return confirm('Remove {{ membership.user.username }}?')">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-person-x"></i>
+              </button>
+            </form>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /tab-content -->
+
+<!-- Add Expense Modal -->
+{% if is_member %}
+<div class="modal fade" id="addExpenseModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content rounded-4 border-0">
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold">Add Expense</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="add-expense-form">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">Description</label>
+            {{ expense_form.description }}
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-8">
+              <label class="form-label fw-semibold small">Amount</label>
+              {{ expense_form.amount }}
+            </div>
+            <div class="col-4">
+              <label class="form-label fw-semibold small">Currency</label>
+              {{ expense_form.currency }}
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">Date</label>
+            {{ expense_form.expense_date }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">Split type</label>
+            {{ expense_form.split_type }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">Category</label>
+            {{ expense_form.category }}
+          </div>
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-plus-lg me-1"></i>Add Expense
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Join Modal (non-member) -->
+{% else %}
+<div class="modal fade" id="joinModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content rounded-4 border-0">
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold">Join {{ group.name }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form method="post" action="{% url 'group_join' group.pk %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">Invite Code</label>
+            <input type="text" name="invite_code" class="form-control" placeholder="10-character code" maxlength="16" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Join Group</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Invite Member Modal (owner only) -->
+{% if is_owner %}
+<div class="modal fade" id="inviteModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content rounded-4 border-0">
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold">Invite Member</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted small mb-3">Share your invite code: <strong class="font-monospace">{{ group.invite_code }}</strong></p>
+        <p class="text-muted small mb-3">Or invite directly by username:</p>
+        <form method="post" action="{% url 'group_invite' group.pk %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <input type="text" name="username" class="form-control" placeholder="Username" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Send Invite</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<form id="csrf-form" style="display:none">{% csrf_token %}</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  const groupPk = {{ group.pk }};
+  const isMember = {{ is_member|yesno:"true,false" }};
+  const csrfToken = document.querySelector('#csrf-form [name=csrfmiddlewaretoken]').value;
+
+  // ── Chat polling ──────────────────────────────────────────────────────────
+  const chatBox = document.getElementById('chat-messages');
+  let lastId = 0;
+
+  // Track last id from rendered messages
+  chatBox.querySelectorAll('[data-msg-id]').forEach(el => {
+    const id = parseInt(el.dataset.msgId);
+    if (id > lastId) lastId = id;
+  });
+
+  function renderMessage(msg, isSelf) {
+    const wrap = document.createElement('div');
+    wrap.className = 'd-flex gap-2 mb-3' + (isSelf ? ' flex-row-reverse' : '');
+    wrap.dataset.msgId = msg.id;
+    if (msg.id > lastId) lastId = msg.id;
+    const initial = (msg.sender_name || '?')[0].toUpperCase();
+    wrap.innerHTML = `
+      <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold"
+           style="width:32px;height:32px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:.8rem;">${initial}</div>
+      <div style="max-width:75%;">
+        <div class="small text-muted mb-1 ${isSelf ? 'text-end' : ''}">${msg.sender_name} · ${new Date(msg.sent_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>
+        <div class="rounded-3 px-3 py-2 ${isSelf ? 'bg-primary text-white' : 'bg-light'}">${msg.body.replace(/</g,'&lt;')}</div>
+      </div>`;
+    return wrap;
+  }
+
+  async function fetchMessages() {
+    if (!isMember) return;
+    try {
+      const r = await fetch(`/groups/${groupPk}/chat/messages/?since=${lastId}`);
+      const data = await r.json();
+      if (data.messages && data.messages.length) {
+        data.messages.forEach(msg => {
+          // guess self by sender_id: we don't have userId in template easily, use sender_name
+          const isSelf = msg.sender_name === '{{ user.username }}';
+          chatBox.appendChild(renderMessage(msg, isSelf));
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+    } catch(e) {}
+  }
+
+  if (isMember) {
+    chatBox.scrollTop = chatBox.scrollHeight;
+    setInterval(fetchMessages, 2000);
+
+    const sendBtn = document.getElementById('chat-send');
+    const input = document.getElementById('chat-input');
+    if (sendBtn && input) {
+      async function sendMsg() {
+        const body = input.value.trim();
+        if (!body) return;
+        input.value = '';
+        const fd = new FormData();
+        fd.append('body', body);
+        fd.append('csrfmiddlewaretoken', csrfToken);
+        try {
+          const r = await fetch(`/groups/${groupPk}/chat/send/`, {method:'POST', body: fd});
+          const data = await r.json();
+          if (data.ok) {
+            chatBox.appendChild(renderMessage(data.message, true));
+            chatBox.scrollTop = chatBox.scrollHeight;
+          }
+        } catch(e) {}
+      }
+      sendBtn.addEventListener('click', sendMsg);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); } });
+    }
+  }
+
+  // ── Itinerary: Add Day ────────────────────────────────────────────────────
+  const addDayBtn = document.getElementById('add-day-btn');
+  if (addDayBtn) {
+    addDayBtn.addEventListener('click', async () => {
+      const title = document.getElementById('new-day-title').value.trim();
+      const date = document.getElementById('new-day-date').value;
+      const fd = new FormData();
+      fd.append('title', title || '');
+      fd.append('date', date || '');
+      fd.append('csrfmiddlewaretoken', csrfToken);
+      const r = await fetch(`/groups/${groupPk}/itinerary/days/add/`, {method:'POST', body:fd});
+      const data = await r.json();
+      if (data.ok) location.reload();
+    });
+  }
+
+  // ── Itinerary: Add Activity ───────────────────────────────────────────────
+  const addActBtn = document.getElementById('add-activity-btn');
+  if (addActBtn) {
+    addActBtn.addEventListener('click', async () => {
+      const dayId = document.getElementById('act-day-select').value;
+      const name = document.getElementById('act-name').value.trim();
+      if (!dayId) { alert('Select a day first.'); return; }
+      if (!name) { alert('Activity name is required.'); return; }
+      const fd = new FormData();
+      fd.append('name', name);
+      fd.append('start_time', document.getElementById('act-start').value);
+      fd.append('end_time', document.getElementById('act-end').value);
+      fd.append('location_name', document.getElementById('act-location').value);
+      fd.append('notes', document.getElementById('act-notes').value);
+      fd.append('csrfmiddlewaretoken', csrfToken);
+      const r = await fetch(`/groups/${groupPk}/itinerary/days/${dayId}/activities/add/`, {method:'POST', body:fd});
+      const data = await r.json();
+      if (data.ok) location.reload();
+    });
+  }
+
+  // ── Itinerary: Delete Activity ────────────────────────────────────────────
+  document.querySelectorAll('.delete-activity-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Delete this activity?')) return;
+      const actId = btn.dataset.activityId;
+      const fd = new FormData();
+      fd.append('csrfmiddlewaretoken', csrfToken);
+      const r = await fetch(`/groups/${groupPk}/itinerary/activities/${actId}/delete/`, {method:'POST', body:fd});
+      const data = await r.json();
+      if (data.ok) btn.closest('li').remove();
+    });
+  });
+
+  // ── Itinerary: SortableJS drag-to-reorder ────────────────────────────────
+  document.querySelectorAll('.sortable-list').forEach(list => {
+    const dayId = list.dataset.dayId;
+    new Sortable(list, {
+      animation: 150,
+      handle: '.bi-grip-vertical',
+      onEnd: async () => {
+        const ids = [...list.querySelectorAll('[data-activity-id]')].map(el => parseInt(el.dataset.activityId));
+        await fetch(`/groups/${groupPk}/itinerary/reorder/`, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json','X-CSRFToken': csrfToken},
+          body: JSON.stringify({ordered_ids: ids}),
+        });
+      },
+    });
+  });
+
+  // ── Expenses: Add ─────────────────────────────────────────────────────────
+  const expForm = document.getElementById('add-expense-form');
+  if (expForm) {
+    expForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(expForm);
+      fd.append('paid_by_id', '{{ user.pk }}');
+      const r = await fetch(`/groups/${groupPk}/expenses/add/`, {method:'POST', body:fd});
+      const data = await r.json();
+      if (data.ok) {
+        location.reload();
+      } else {
+        alert(data.error || 'Error adding expense.');
+      }
+    });
+  }
+
+  // ── Expenses: Delete ──────────────────────────────────────────────────────
+  document.querySelectorAll('.delete-expense-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Delete this expense? This will reverse all balance changes.')) return;
+      const expId = btn.dataset.expenseId;
+      const fd = new FormData();
+      fd.append('csrfmiddlewaretoken', csrfToken);
+      const r = await fetch(`/groups/${groupPk}/expenses/${expId}/delete/`, {method:'POST', body:fd});
+      const data = await r.json();
+      if (data.ok) {
+        btn.closest('.expense-item').remove();
+        location.reload();
+      } else {
+        alert(data.error || 'Error.');
+      }
+    });
+  });
+})();
+</script>
+{% endblock %}

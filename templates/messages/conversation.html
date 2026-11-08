@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}Chat with {{ other_user.username }} · TravelMatch{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+
+    <!-- Conversation header -->
+    <div class="card border-0 shadow-sm rounded-4 mb-0" style="border-bottom-left-radius:0!important;border-bottom-right-radius:0!important;">
+      <div class="card-body px-4 py-3 d-flex align-items-center gap-3">
+        <a href="{% url 'dm_inbox' %}" class="btn btn-sm btn-outline-secondary me-1">
+          <i class="bi bi-arrow-left"></i>
+        </a>
+        <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white flex-shrink-0"
+             style="width:42px;height:42px;background:linear-gradient(135deg,#6366f1,#8b5cf6);">
+          {{ other_user.username|first|upper }}
+        </div>
+        <div class="flex-grow-1">
+          <div class="fw-bold">{{ other_user.username }}</div>
+          {% if their_profile %}
+          <div class="text-muted small">{{ their_profile.get_style_display }} · {{ their_profile.get_budget_display }}</div>
+          {% endif %}
+        </div>
+        <span class="badge bg-success bg-opacity-10 text-success" style="font-size:.7rem;">
+          <i class="bi bi-heart-fill me-1"></i>Mutual Match
+        </span>
+      </div>
+    </div>
+
+    <!-- Message thread -->
+    <div class="card border-0 shadow-sm" style="border-radius:0;">
+      <div class="card-body p-4" id="dm-messages" style="height:420px;overflow-y:auto;">
+        {% for msg in messages_list %}
+        <div class="dm-bubble-wrap {% if msg.sender == request.user %}mine{% else %}theirs{% endif %}">
+          {% if msg.sender != request.user %}
+          <div class="dm-bubble-avatar flex-shrink-0">
+            {{ msg.sender.username|first|upper }}
+          </div>
+          {% endif %}
+          <div>
+            <div class="dm-bubble {% if msg.sender == request.user %}mine{% else %}theirs{% endif %}">
+              {{ msg.body }}
+            </div>
+            <div class="dm-time {% if msg.sender != request.user %}theirs{% endif %}">
+              {{ msg.sent_at|date:"M d · H:i" }}
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-4">
+          <div class="mb-2" style="font-size:2.5rem;opacity:.25;">👋</div>
+          <p class="text-muted small">No messages yet. Say hello!</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Input bar -->
+    <div class="card border-0 shadow-sm rounded-4 dm-input-bar" style="border-top-left-radius:0!important;border-top-right-radius:0!important;">
+      <form id="dm-form" class="d-flex align-items-center gap-2 px-2 py-1">
+        {% csrf_token %}
+        <input id="dm-input" type="text" class="form-control border-0" placeholder="Type a message…" autocomplete="off" style="border-radius:var(--radius-pill);background:#f1f5f9;" />
+        <button type="submit" class="btn btn-primary flex-shrink-0" style="border-radius:50%;width:40px;height:40px;padding:0;">
+          <i class="bi bi-send-fill" style="font-size:.9rem;"></i>
+        </button>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<form id="csrf-holder" style="display:none;">{% csrf_token %}</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  const csrf    = document.querySelector('#csrf-holder [name=csrfmiddlewaretoken]').value;
+  const box     = document.getElementById('dm-messages');
+  const form    = document.getElementById('dm-form');
+  const input   = document.getElementById('dm-input');
+  const userId  = {{ other_user.pk }};
+  const me      = {{ request.user.pk }};
+  let lastId    = {{ messages_list.last.pk|default:0 }};
+
+  // Scroll to bottom
+  box.scrollTop = box.scrollHeight;
+
+  function renderMsg(m) {
+    const isMine = m.sender_id === me;
+    const wrap   = document.createElement('div');
+    wrap.className = 'dm-bubble-wrap ' + (isMine ? 'mine' : 'theirs');
+
+    const t = new Date(m.sent_at);
+    const timeStr = t.toLocaleString('en-GB', {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+
+    if (!isMine) {
+      const av = document.createElement('div');
+      av.className = 'dm-bubble-avatar flex-shrink-0';
+      av.textContent = m.sender_name.charAt(0).toUpperCase();
+      wrap.appendChild(av);
+    }
+
+    const inner = document.createElement('div');
+    inner.innerHTML = `
+      <div class="dm-bubble ${isMine ? 'mine' : 'theirs'}">${m.body.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+      <div class="dm-time ${isMine ? '' : 'theirs'}">${timeStr}</div>
+    `;
+    wrap.appendChild(inner);
+
+    // Remove "no messages" placeholder if present
+    const placeholder = box.querySelector('.text-center');
+    if (placeholder) placeholder.remove();
+
+    box.appendChild(wrap);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  // Send
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const body = input.value.trim();
+    if (!body) return;
+    const fd = new FormData();
+    fd.append('body', body);
+    fd.append('csrfmiddlewaretoken', csrf);
+    input.value = '';
+    fetch(`/messages/${userId}/send/`, {method:'POST', body:fd})
+      .then(r => r.json())
+      .then(d => { if (d.ok) { renderMsg(d.message); lastId = d.message.id; } });
+  });
+
+  // Poll
+  function poll() {
+    fetch(`/messages/${userId}/poll/?since=${lastId}`)
+      .then(r => r.json())
+      .then(d => {
+        d.messages.forEach(m => {
+          if (m.sender_id !== me) { renderMsg(m); lastId = m.id; }
+          else if (m.id > lastId) { lastId = m.id; }
+        });
+      })
+      .catch(() => {});
+  }
+
+  setInterval(poll, 3000);
+})();
+</script>
+{% endblock %}

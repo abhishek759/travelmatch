@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} Group · TravelMatch{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="d-flex align-items-center gap-3 mb-4">
+      <a href="{% url 'group_list' %}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Groups
+      </a>
+      <h2 class="fw-bold mb-0">{{ action }} Trip Group</h2>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body p-4 p-md-5">
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label for="{{ form.name.id_for_label }}" class="form-label fw-semibold">Group name</label>
+            {{ form.name }}
+            {% if form.name.errors %}<div class="invalid-feedback d-block">{{ form.name.errors|join:", " }}</div>{% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label for="{{ form.destination.id_for_label }}" class="form-label fw-semibold">Destination</label>
+            {{ form.destination }}
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label for="{{ form.start_date.id_for_label }}" class="form-label fw-semibold">Start date</label>
+              {{ form.start_date }}
+            </div>
+            <div class="col-md-6">
+              <label for="{{ form.end_date.id_for_label }}" class="form-label fw-semibold">End date</label>
+              {{ form.end_date }}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="{{ form.max_members.id_for_label }}" class="form-label fw-semibold">Max members</label>
+            {{ form.max_members }}
+          </div>
+
+          <div class="mb-4">
+            <label for="{{ form.description.id_for_label }}" class="form-label fw-semibold">Description <span class="text-muted fw-normal">(optional)</span></label>
+            {{ form.description }}
+          </div>
+
+          <div class="d-flex gap-3">
+            <button type="submit" class="btn btn-primary flex-fill">
+              <i class="bi bi-check2 me-1"></i>{{ action }} Group
+            </button>
+            <a href="{% url 'group_list' %}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

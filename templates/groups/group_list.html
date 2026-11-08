@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}Trip Groups · TravelMatch{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+  <div>
+    <h2 class="fw-bold mb-0">Trip Groups</h2>
+    <p class="text-muted mb-0 small">Create a group or join an existing one with an invite code.</p>
+  </div>
+  <a href="{% url 'group_create' %}" class="btn btn-primary btn-sm">
+    <i class="bi bi-plus-lg me-1"></i>New Group
+  </a>
+</div>
+
+<!-- My groups -->
+<h5 class="fw-semibold mb-3"><i class="bi bi-person-check me-2 text-primary"></i>My Groups</h5>
+{% if my_groups %}
+<div class="row g-3 mb-5">
+  {% for group in my_groups %}
+  <div class="col-md-6 col-lg-4">
+    <a href="{% url 'group_detail' group.pk %}" class="card border-0 shadow-sm rounded-4 h-100 text-decoration-none text-dark">
+      <div class="card-body p-4">
+        <div class="d-flex align-items-start justify-content-between mb-2">
+          <h6 class="fw-bold mb-0">{{ group.name }}</h6>
+          {% if group.owner == user %}<span class="badge bg-primary bg-opacity-10 text-primary">Owner</span>{% endif %}
+        </div>
+        <div class="text-muted small mb-2">
+          <i class="bi bi-geo-alt me-1"></i>{{ group.destination }}
+        </div>
+        {% if group.start_date %}
+        <div class="text-muted small mb-2">
+          <i class="bi bi-calendar3 me-1"></i>{{ group.start_date|date:"M d" }} – {{ group.end_date|date:"M d, Y" }}
+        </div>
+        {% endif %}
+        {% if group.description %}
+        <p class="text-muted small mb-3">{{ group.description|truncatechars:80 }}</p>
+        {% endif %}
+        <div class="d-flex align-items-center justify-content-between">
+          <span class="badge bg-secondary bg-opacity-10 text-secondary">
+            <i class="bi bi-people me-1"></i>{{ group.member_count }}/{{ group.max_members }}
+          </span>
+          <i class="bi bi-arrow-right text-primary"></i>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<p class="text-muted mb-5">You're not in any groups yet. Create one or join with an invite code.</p>
+{% endif %}
+
+<!-- Browse & Join -->
+<div class="row g-4">
+  <div class="col-lg-8">
+    <h5 class="fw-semibold mb-3"><i class="bi bi-globe me-2 text-primary"></i>Other Groups</h5>
+    {% if all_groups %}
+    <div class="row g-3">
+      {% for group in all_groups %}
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+          <div class="card-body p-4">
+            <h6 class="fw-bold mb-1">{{ group.name }}</h6>
+            <div class="text-muted small mb-1"><i class="bi bi-geo-alt me-1"></i>{{ group.destination }}</div>
+            {% if group.start_date %}
+            <div class="text-muted small mb-2"><i class="bi bi-calendar3 me-1"></i>{{ group.start_date|date:"M d" }} – {{ group.end_date|date:"M d, Y" }}</div>
+            {% endif %}
+            {% if group.description %}
+            <p class="text-muted small mb-3">{{ group.description|truncatechars:70 }}</p>
+            {% endif %}
+            <div class="d-flex align-items-center justify-content-between">
+              <span class="badge bg-secondary bg-opacity-10 text-secondary">
+                <i class="bi bi-people me-1"></i>{{ group.member_count }}/{{ group.max_members }}
+              </span>
+              <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#joinModal" data-group-id="{{ group.pk }}" data-group-name="{{ group.name }}">
+                Join
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted">No other public groups available right now.</p>
+    {% endif %}
+  </div>
+
+  <!-- Join by code -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body p-4">
+        <h6 class="fw-semibold mb-1"><i class="bi bi-key me-2 text-primary"></i>Join by Invite Code</h6>
+        <p class="text-muted small mb-3">Enter the code shared by a group member.</p>
+        <form method="post" action="">
+          {% csrf_token %}
+          <input type="hidden" name="group_pk" id="join-group-pk" value="">
+          <div class="mb-3">
+            <input type="text" name="invite_code" class="form-control" placeholder="e.g., ABC123XYZ9" maxlength="16">
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Join Group</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Join modal -->
+<div class="modal fade" id="joinModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content rounded-4 border-0">
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold">Join Group</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted small mb-3">Enter the invite code to join <strong id="modal-group-name"></strong>.</p>
+        <form method="post" id="modal-join-form">
+          {% csrf_token %}
+          <input type="hidden" name="group_pk" id="modal-group-pk" value="">
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">Invite Code</label>
+            <input type="text" name="invite_code" class="form-control" placeholder="10-character invite code" maxlength="16" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Join</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const joinModal = document.getElementById('joinModal');
+if (joinModal) {
+  joinModal.addEventListener('show.bs.modal', function(e) {
+    const btn = e.relatedTarget;
+    document.getElementById('modal-group-name').textContent = btn.dataset.groupName;
+    document.getElementById('modal-group-pk').value = btn.dataset.groupId;
+    document.getElementById('modal-join-form').action = '/groups/' + btn.dataset.groupId + '/join/';
+  });
+}
+</script>
+{% endblock %}

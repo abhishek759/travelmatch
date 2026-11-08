@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}TravelMatch — Find Your Travel Companion{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<div class="hero-section">
+  <div class="hero-badge">
+    <i class="bi bi-stars"></i> AI-powered travel matching
+  </div>
+  <h1 class="hero-title">
+    Find Your Perfect<br><span class="gradient-text">Travel Companion</span>
+  </h1>
+  <p class="hero-sub">
+    Connect with travelers who match your style, budget, and dream destinations.
+    Plan trips together, chat privately, and split expenses fairly.
+  </p>
+  <div class="d-flex gap-3 justify-content-center flex-wrap mb-4">
+    {% if user.is_authenticated %}
+    <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg px-4">
+      <i class="bi bi-speedometer2 me-2"></i>Go to Dashboard
+    </a>
+    {% else %}
+    <a href="{% url 'signup' %}" class="btn btn-primary btn-lg px-4">
+      <i class="bi bi-rocket-takeoff me-2"></i>Get Started Free
+    </a>
+    <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-lg px-4">Sign In</a>
+    {% endif %}
+  </div>
+  <div class="d-flex gap-2 flex-wrap justify-content-center">
+    <span class="hero-feature-pill"><i class="bi bi-shield-check text-primary"></i> No credit card needed</span>
+    <span class="hero-feature-pill"><i class="bi bi-people text-primary"></i> Smart compatibility scoring</span>
+    <span class="hero-feature-pill"><i class="bi bi-chat-heart text-primary"></i> Private messaging</span>
+  </div>
+</div>
+
+<!-- Features -->
+<div class="row g-4 mb-5">
+  {% for icon, grad, title, desc in features|default:'' %}{% endfor %}
+  <div class="col-md-6 col-lg-3">
+    <div class="card card-hover-lift h-100 text-center p-4">
+      <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3"
+           style="width:58px;height:58px;background:linear-gradient(135deg,#6366f1,#8b5cf6);">
+        <i class="bi bi-people-fill text-white fs-4"></i>
+      </div>
+      <h6 class="fw-bold mb-2">Smart Matching</h6>
+      <p class="text-muted small mb-0">Compatibility scored across budget, style, destinations, duration, and accommodation.</p>
+    </div>
+  </div>
+  <div class="col-md-6 col-lg-3">
+    <div class="card card-hover-lift h-100 text-center p-4">
+      <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3"
+           style="width:58px;height:58px;background:linear-gradient(135deg,#f43f5e,#e11d48);">
+        <i class="bi bi-chat-heart-fill text-white fs-4"></i>
+      </div>
+      <h6 class="fw-bold mb-2">Private Messaging</h6>
+      <p class="text-muted small mb-0">DM mutual matches directly. Real-time chat with unread indicators — only people you both liked.</p>
+    </div>
+  </div>
+  <div class="col-md-6 col-lg-3">
+    <div class="card card-hover-lift h-100 text-center p-4">
+      <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3"
+           style="width:58px;height:58px;background:linear-gradient(135deg,#10b981,#34d399);">
+        <i class="bi bi-calendar2-week-fill text-white fs-4"></i>
+      </div>
+      <h6 class="fw-bold mb-2">Trip Planning</h6>
+      <p class="text-muted small mb-0">Build day-by-day itineraries, assign activities, and coordinate in the group chat.</p>
+    </div>
+  </div>
+  <div class="col-md-6 col-lg-3">
+    <div class="card card-hover-lift h-100 text-center p-4">
+      <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3"
+           style="width:58px;height:58px;background:linear-gradient(135deg,#f59e0b,#f97316);">
+        <i class="bi bi-cash-coin text-white fs-4"></i>
+      </div>
+      <h6 class="fw-bold mb-2">Expense Splitting</h6>
+      <p class="text-muted small mb-0">Track costs and get a minimal-transfer settlement plan so everyone pays the least number of people.</p>
+    </div>
+  </div>
+</div>
+
+<!-- How it works -->
+<div class="card p-5 mb-5" style="background:linear-gradient(135deg,rgba(99,102,241,.04),rgba(139,92,246,.04));">
+  <h3 class="fw-bold text-center mb-5" style="letter-spacing:-.02em;">How it works</h3>
+  <div class="row g-4 text-center">
+    <div class="col-md-4">
+      <div class="d-inline-flex align-items-center justify-content-center rounded-circle text-white fw-bold mb-3"
+           style="width:50px;height:50px;font-size:1.2rem;background:linear-gradient(135deg,#6366f1,#8b5cf6);box-shadow:0 4px 14px rgba(99,102,241,.4);">1</div>
+      <h6 class="fw-bold mb-1">Create your profile</h6>
+      <p class="text-muted small mb-0">Set your travel style, budget, dream destinations, and preferred months.</p>
+    </div>
+    <div class="col-md-4">
+      <div class="d-inline-flex align-items-center justify-content-center rounded-circle text-white fw-bold mb-3"
+           style="width:50px;height:50px;font-size:1.2rem;background:linear-gradient(135deg,#f43f5e,#e11d48);box-shadow:0 4px 14px rgba(244,63,94,.4);">2</div>
+      <h6 class="fw-bold mb-1">Discover & match</h6>
+      <p class="text-muted small mb-0">Browse ranked travelers, like the ones you vibe with. A mutual like unlocks private chat.</p>
+    </div>
+    <div class="col-md-4">
+      <div class="d-inline-flex align-items-center justify-content-center rounded-circle text-white fw-bold mb-3"
+           style="width:50px;height:50px;font-size:1.2rem;background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 4px 14px rgba(16,185,129,.4);">3</div>
+      <h6 class="fw-bold mb-1">Plan & travel together</h6>
+      <p class="text-muted small mb-0">Create a trip group, build the itinerary, and track shared expenses in one place.</p>
+    </div>
+  </div>
+</div>
+
+{% if not user.is_authenticated %}
+<div class="text-center py-4 mb-5">
+  <h3 class="fw-bold mb-2" style="letter-spacing:-.02em;">Ready to find your travel match?</h3>
+  <p class="text-muted mb-4">Join thousands of travelers planning their next adventure.</p>
+  <a href="{% url 'signup' %}" class="btn btn-primary btn-lg px-5">
+    <i class="bi bi-person-plus me-2"></i>Join TravelMatch
+  </a>
+</div>
+{% endif %}
+{% endblock %}

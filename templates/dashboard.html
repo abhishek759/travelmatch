@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · TravelMatch{% endblock %}
+
+{% block content %}
+<!-- Page header -->
+<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+  <div>
+    <h2 class="fw-bold mb-0" style="letter-spacing:-.02em;">
+      Hey, {{ user.username }}! <span style="font-size:1.5rem;">👋</span>
+    </h2>
+    <p class="text-muted mb-0 small">Here's what's happening with your trips.</p>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    <a href="{% url 'match_feed' %}" class="btn btn-outline-primary btn-sm">
+      <i class="bi bi-compass me-1"></i>Discover
+    </a>
+    <a href="{% url 'group_create' %}" class="btn btn-primary btn-sm">
+      <i class="bi bi-plus-lg me-1"></i>New Group
+    </a>
+  </div>
+</div>
+
+<!-- Stat cards -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="stat-card stat-indigo">
+      <div class="stat-num">{{ groups_count }}</div>
+      <div class="stat-label">Trip Groups</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card stat-neutral">
+      <div class="stat-num">{{ mutual_count }}</div>
+      <div class="stat-label">Mutual Matches</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <a href="{% url 'dm_inbox' %}" class="text-decoration-none">
+      <div class="stat-card stat-neutral">
+        <div class="stat-num">{{ unread_dm_count }}</div>
+        <div class="stat-label">Unread DMs</div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-md-3">
+    <a href="{% url 'match_feed' %}" class="text-decoration-none">
+      <div class="stat-card stat-amber">
+        <div class="stat-num">{{ recent_matches|length }}</div>
+        <div class="stat-label">Top Matches</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- Main content grid -->
+<div class="row g-4 mb-4">
+  <!-- My Groups -->
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm rounded-4 h-100">
+      <div class="card-header bg-transparent border-0 px-4 pt-4 pb-2 d-flex align-items-center justify-content-between">
+        <span class="section-header mb-0"><i class="bi bi-map text-primary"></i>My Trip Groups</span>
+        <a href="{% url 'group_list' %}" class="btn btn-sm btn-outline-secondary">All Groups</a>
+      </div>
+      <div class="card-body px-4 pb-4">
+        {% if my_groups %}
+        <div class="list-group list-group-flush">
+          {% for group in my_groups %}
+          <a href="{% url 'group_detail' group.pk %}" class="list-group-item list-group-item-action border-0 px-0 py-3 text-decoration-none rounded-3">
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-center rounded-3 flex-shrink-0"
+                     style="width:42px;height:42px;background:linear-gradient(135deg,#6366f1,#8b5cf6);">
+                  <i class="bi bi-geo-alt-fill text-white"></i>
+                </div>
+                <div>
+                  <div class="fw-semibold small">{{ group.name }}</div>
+                  <div class="text-muted" style="font-size:.75rem;">
+                    {{ group.destination }}
+                    {% if group.start_date %} · {{ group.start_date|date:"M d" }}–{{ group.end_date|date:"M d, Y" }}{% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="text-end">
+                <span class="badge bg-primary bg-opacity-10 text-primary">{{ group.member_count }} member{{ group.member_count|pluralize }}</span>
+                {% if group.owner == user %}
+                <div class="text-muted mt-1" style="font-size:.7rem;">Owner</div>
+                {% endif %}
+              </div>
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+          <div class="mb-3" style="font-size:2.5rem;opacity:.25;">🗺️</div>
+          <p class="text-muted mb-3 small">You're not in any groups yet.</p>
+          <a href="{% url 'group_create' %}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-lg me-1"></i>Create a Group
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Matches -->
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm rounded-4 h-100">
+      <div class="card-header bg-transparent border-0 px-4 pt-4 pb-2 d-flex align-items-center justify-content-between">
+        <span class="section-header mb-0"><i class="bi bi-compass text-primary"></i>Top Matches</span>
+        <a href="{% url 'match_feed' %}" class="btn btn-sm btn-outline-secondary">Discover All</a>
+      </div>
+      <div class="card-body px-4 pb-4">
+        {% if recent_matches %}
+        <div class="d-flex flex-column gap-3">
+          {% for user_obj, score in recent_matches %}
+          <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold text-white"
+                 style="width:42px;height:42px;background:linear-gradient(135deg,#6366f1,#8b5cf6);font-size:.9rem;">
+              {{ user_obj.username|first|upper }}
+            </div>
+            <div class="flex-grow-1">
+              <div class="fw-semibold small">{{ user_obj.username }}</div>
+              <div class="progress mt-1" style="height:5px;">
+                <div class="progress-bar" style="width:{{ score|floatformat:0 }}%;background:linear-gradient(90deg,#6366f1,#8b5cf6);"></div>
+              </div>
+            </div>
+            <span class="badge bg-primary bg-opacity-10 text-primary fw-bold">{{ score|floatformat:0 }}%</span>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+          <div class="mb-3" style="font-size:2.5rem;opacity:.25;">👥</div>
+          <p class="text-muted mb-3 small">No matches yet.</p>
+          <a href="{% url 'match_feed' %}" class="btn btn-primary btn-sm">Discover Travelers</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Mutual Matches preview -->
+{% if mutual_with_scores %}
+<div class="card border-0 shadow-sm rounded-4">
+  <div class="card-header bg-transparent border-0 px-4 pt-4 pb-2 d-flex align-items-center justify-content-between">
+    <span class="section-header mb-0"><i class="bi bi-heart-fill text-danger"></i>Mutual Matches</span>
+    <a href="{% url 'mutual_matches' %}" class="btn btn-sm btn-outline-secondary">View All</a>
+  </div>
+  <div class="card-body px-4 pb-4">
+    <div class="row g-3">
+      {% for u, sc in mutual_with_scores %}
+      <div class="col-sm-6 col-lg-4">
+        <div class="mutual-card">
+          <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold text-white"
+               style="width:46px;height:46px;background:linear-gradient(135deg,#6366f1,#8b5cf6);">
+            {{ u.username|first|upper }}
+          </div>
+          <div class="flex-grow-1 min-w-0">
+            <div class="fw-semibold small text-truncate">{{ u.username }}</div>
+            <div class="text-muted" style="font-size:.72rem;">{{ sc }}% match</div>
+            <div class="progress mt-1" style="height:3px;">
+              <div class="progress-bar" style="width:{{ sc|floatformat:0 }}%;background:linear-gradient(90deg,#6366f1,#8b5cf6);"></div>
+            </div>
+          </div>
+          <a href="{% url 'dm_conversation' u.pk %}" class="btn btn-message btn-sm flex-shrink-0" style="font-size:.75rem;padding:.3rem .7rem;">
+            <i class="bi bi-chat-dots"></i>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

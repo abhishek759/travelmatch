@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Set Up Your Profile · TravelMatch{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="text-center mb-4">
+      <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+           style="width:56px;height:56px;background:linear-gradient(135deg,#6366f1,#8b5cf6);">
+        <i class="bi bi-person-badge-fill text-white fs-4"></i>
+      </div>
+      <h2 class="fw-bold mb-1">Set up your travel profile</h2>
+      <p class="text-muted">Tell us about your travel style so we can find your perfect matches.</p>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body p-4 p-md-5">
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          <!-- Bio -->
+          <div class="mb-4">
+            <label for="{{ form.bio.id_for_label }}" class="form-label fw-semibold">About you</label>
+            {{ form.bio }}
+            {% if form.bio.errors %}<div class="invalid-feedback d-block">{{ form.bio.errors|join:", " }}</div>{% endif %}
+          </div>
+
+          <div class="row g-3 mb-4">
+            <!-- Travel Style -->
+            <div class="col-md-6">
+              <label for="{{ form.style.id_for_label }}" class="form-label fw-semibold">Travel style</label>
+              {{ form.style }}
+            </div>
+            <!-- Budget -->
+            <div class="col-md-6">
+              <label for="{{ form.budget.id_for_label }}" class="form-label fw-semibold">Budget range</label>
+              {{ form.budget }}
+            </div>
+            <!-- Duration -->
+            <div class="col-md-6">
+              <label for="{{ form.duration.id_for_label }}" class="form-label fw-semibold">Preferred trip length</label>
+              {{ form.duration }}
+            </div>
+            <!-- Accommodation -->
+            <div class="col-md-6">
+              <label for="{{ form.accommodation.id_for_label }}" class="form-label fw-semibold">Accommodation preference</label>
+              {{ form.accommodation }}
+            </div>
+          </div>
+
+          <!-- Destinations -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Dream destinations <span class="text-muted fw-normal">(select all that interest you)</span></label>
+            <div class="row g-2">
+              {% for value, label in form.fields.destinations.choices %}
+              <div class="col-6 col-md-4">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="destinations" value="{{ value }}" id="dest_{{ value }}"
+                    {% if value in form.initial.destinations %}checked{% endif %}>
+                  <label class="form-check-label" for="dest_{{ value }}">{{ label }}</label>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Travel months -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Preferred travel months</label>
+            <div class="row g-2">
+              {% for value, label in form.fields.travel_months.choices %}
+              <div class="col-6 col-md-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="travel_months" value="{{ value }}" id="month_{{ value }}"
+                    {% if value|stringformat:"s" in form.initial.travel_months %}checked{% endif %}>
+                  <label class="form-check-label" for="month_{{ value }}">{{ label }}</label>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg w-100">
+            <i class="bi bi-check2-circle me-2"></i>Save Profile & Discover Matches
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

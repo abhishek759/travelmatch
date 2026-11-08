@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Messages · TravelMatch{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="page-hero d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+  <div>
+    <h2 class="fw-bold mb-1" style="letter-spacing:-.02em;">
+      <i class="bi bi-chat-dots-fill me-2"></i>Messages
+    </h2>
+    <p class="mb-0" style="opacity:.85;font-size:.9rem;">Private conversations with your mutual matches.</p>
+  </div>
+  <a href="{% url 'mutual_matches' %}" class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.35);">
+    <i class="bi bi-heart me-1"></i>View Matches
+  </a>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm rounded-4">
+      {% if conversations %}
+      <div class="card-body p-0">
+        {% for conv in conversations %}
+        <a href="{% url 'dm_conversation' conv.partner.pk %}" class="inbox-item">
+          <!-- Avatar -->
+          <div class="inbox-avatar flex-shrink-0">
+            {{ conv.partner.username|first|upper }}
+          </div>
+          <!-- Content -->
+          <div class="flex-grow-1 min-w-0">
+            <div class="d-flex align-items-center justify-content-between mb-1">
+              <span class="fw-semibold small {% if conv.unread > 0 %}text-dark{% else %}text-muted{% endif %}">
+                {{ conv.partner.username }}
+              </span>
+              {% if conv.latest %}
+              <span class="text-muted" style="font-size:.7rem;white-space:nowrap;margin-left:.5rem;">
+                {{ conv.latest.sent_at|date:"M d · H:i" }}
+              </span>
+              {% endif %}
+            </div>
+            <div class="d-flex align-items-center justify-content-between gap-2">
+              <span class="text-muted text-truncate" style="font-size:.82rem;">
+                {% if conv.latest %}
+                  {% if conv.latest.sender == request.user %}<span class="text-muted">You: </span>{% endif %}
+                  {{ conv.latest.body|truncatechars:55 }}
+                {% else %}
+                  <em>No messages yet</em>
+                {% endif %}
+              </span>
+              {% if conv.unread > 0 %}
+              <span class="badge rounded-pill flex-shrink-0" style="background:#f43f5e;color:#fff;font-size:.65rem;">
+                {{ conv.unread }}
+              </span>
+              {% endif %}
+            </div>
+          </div>
+          <i class="bi bi-chevron-right text-muted flex-shrink-0" style="font-size:.75rem;"></i>
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="card-body text-center py-5">
+        <div class="mb-3" style="font-size:3.5rem;opacity:.2;">💬</div>
+        <h6 class="mb-2">No conversations yet</h6>
+        <p class="text-muted small mb-4">Message your mutual matches to start planning trips together.</p>
+        <a href="{% url 'mutual_matches' %}" class="btn btn-primary btn-sm px-4">
+          <i class="bi bi-heart me-1"></i>See Mutual Matches
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
